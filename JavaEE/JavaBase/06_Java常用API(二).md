@@ -56,7 +56,7 @@ public class MyClass /*extends Object*/ {
        }
    ```
 
-**详解参考：[hashcode与equals详解](F_hashcode_与_equals详解.md)**
+**详解参考：[hashcode与equals详解](./attach/F_hashcode_与_equals详解.md)**
 
 
 
@@ -215,7 +215,7 @@ Calendar类中提供很多成员常量，代表给定的日历字段：
 
 ### 2.5、开发中常用的工具包（积累）
 
-[DateUtil](F_DateUtil.md)
+[DateUtil](./attach/F_DateUtil.md)
 
 
 
@@ -255,7 +255,7 @@ for(int i = 0;i<100;i++){
 
 如果对字符串进行拼接操作，每次拼接，都会构建一个新的String对象，既耗时，又浪费空间。这样就很不像话！极大的消耗我们的内存资源，很不科学！此时，引入StringBuilder类可以大大提升程序性能，占用空间少；
 
-![StringBuilder原理示意图](F0-StringBuilder的原理.bmp)
+![StringBuilder原理示意图](./attach/img/F0-StringBuilder的原理.bmp)
 
 ###4.2、构造方法
 
