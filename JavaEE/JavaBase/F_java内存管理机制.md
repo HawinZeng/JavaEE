@@ -18,7 +18,7 @@
 
 ####  2.2、Java运行时的内存模型  
 
-![](F08-java-runtime-memory.jpg)
+![](F0-java-runtime-memory.jpg)
 
 1. **程序计数器（Program Counter Register）**
 
@@ -70,7 +70,6 @@
 
    ​	直接内存并不是JVM管理的内存，可以这样理解，直接内存，就是JVM以外的机器内存，比如，你有4G的内存，JVM占用了1G，则其余的3G就是直接内存，在jdk1.4之后新加入了NIO，在NIO类中引入一种基于通道（Channel）和缓冲区（Buffer）的内存分配方式，将由C语言实现的native函数库分配在直接内存中，用存储在JVM堆中的DirectByteBuffer来引用。由于直接内存收到本机器内存的限制，所以也可能出现OutOfMemoryError的异常。
 
-   
 
 ## 4. 对象的创建，布局和访问过程  
 #### 4.1 对象的创建
@@ -101,15 +100,15 @@ HotSpot的对齐方式为8字节对齐：(对象头+实例数据+padding)%8 等�
 
   对齐填充并不是必然存在的，仅仅起着占位符的作用。Hotpot VM要求对象起始地址必须是8字节的整数倍，对象头部分正好是8字节的倍数，所以当实例数据部分没有对齐时，需要通过对齐填充来对齐。  
 
-![](java_object.png)
+![](F0-java_object.png)
 
 #### 4.3 对象的访问定位
 Java程序通过栈上的reference数据来操作堆上的具体对象。主要的访问方式有使用句柄和直接指针两种：
 
 句柄：Java堆将会划出一块内存来作为句柄池，引用中存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自的具体地址信息 。如图所示：  
-![](java-visit-1.png)    
+![](F0-java-visit-1.png)    
 直接指针：Java堆对象的布局要考虑如何放置访问类型数据的相关信息，引用中存储的就是对象地址 。如图所示：
-![](java-visit-2.png)  
+![](F0-java-visit-2.png)  
 两个方式各有优点，使用句柄最大的好处是引用中存储的是稳定的句柄地址，对象被移动时只会改变句柄中实例的地址，引用不需要修改、使用直接指针访问的好处是速度更快，它节省了一次指针定位的时间开销。
 
 #### 4.5 对象占内存计算
@@ -210,12 +209,12 @@ OOM解决：使用NIO分配本机内存多注意是否超过MaxDirectMemorySize�
 这里所说的内存分配，主要指的是在堆上的分配，一般的，对象的内存分配都是在堆上进行，但现代技术也支持将对象拆成标量类型（标量类型即原子类型，表示单个值，可以是基本类型或String等），然后在栈上分配，在栈上分配的很少见，我们这里不考虑。
 
 　　Java内存分配和回收的机制概括的说，就是：分代分配，分代回收。对象将根据存活的时间被分为：年轻代（Young Generation）、年老代（Old Generation）、永久代（Permanent Generation，也就是方法区）。如下图（来源于《成为JavaGC专家part I》，http://www.importnew.com/1993.html）：  
-　　![](memory_allocation.png)
+　　![](F0-memory_allocation.png)
 
 年轻代（Young Generation）：对象被创建时，内存的分配首先发生在年轻代（大对象可以直接被创建在年老代），大部分的对象在创建后很快就不再使用，因此很快变得不可达，于是被年轻代的GC机制清理掉（IBM的研究表明，98%的对象都是很快消亡的），这个GC机制被称为Minor GC或叫Young GC。注意，Minor GC并不代表年轻代内存不足，它事实上只表示在Eden区上的GC。
 
 　　年轻代上的内存分配是这样的，年轻代可以分为3个区域：Eden区（伊甸园，亚当和夏娃偷吃禁果生娃娃的地方，用来表示内存首次分配的区域，再贴切不过）和两个存活区（Survivor 0 、Survivor 1）。内存分配过程为（来源于《成为JavaGC专家part I》，http://www.importnew.com/1993.html）：　  
-　　![](memory_gc.png)  
+　　![](F0-memory_gc.png)  
 
 1.绝大多数刚创建的对象会被分配在Eden区，其中的大多数对象很快就会消亡。Eden区是连续的内存空间，因此在其上分配内存极快；  
 2. 最初一次，当Eden区满的时候，执行Minor GC，将消亡的对象清理掉，并将剩余的对象复制到一个存活区Survivor0（此时，Survivor1是空白的，两个Survivor总有一个是空白的）；  
@@ -249,8 +248,8 @@ GC机制的基本算法是：分代收集，这个不用赘述。下面阐述每
 　　老年代：
 
 　　老年代存储的对象比年轻代多得多，而且不乏大对象，对老年代进行内存清理时，如果使用停止-复制算法，则相当低效。一般，老年代用的算法是标记-整理算法，即：标记出仍然存活的对象（存在引用的），将所有存活的对象向一端移动，以保证内存的连续。
-     在发生Minor GC时，虚拟机会检查每次晋升进入老年代的大小是否大于老年代的剩余空间大小，如果大于，则直接触发一次Full GC，否则，就查看是否设置了-XX:+HandlePromotionFailure（允许担保失败），如果允许，则只会进行MinorGC，此时可以容忍内存分配失败；如果不允许，则仍然进行Full GC（这代表着如果设置-XX:+Handle PromotionFailure，则触发MinorGC就会同时触发Full GC，哪怕老年代还有很多内存，所以，最好不要这样做）。
-     
+​     在发生Minor GC时，虚拟机会检查每次晋升进入老年代的大小是否大于老年代的剩余空间大小，如果大于，则直接触发一次Full GC，否则，就查看是否设置了-XX:+HandlePromotionFailure（允许担保失败），如果允许，则只会进行MinorGC，此时可以容忍内存分配失败；如果不允许，则仍然进行Full GC（这代表着如果设置-XX:+Handle PromotionFailure，则触发MinorGC就会同时触发Full GC，哪怕老年代还有很多内存，所以，最好不要这样做）。
+​     
 　　方法区（永久代）：
 
 　　永久代的回收有两种：常量池中的常量，无用的类信息，常量的回收很简单，没有引用了就可以被回收。对于无用的类进行回收，必须保证3点：
@@ -260,10 +259,10 @@ GC机制的基本算法是：分代收集，这个不用赘述。下面阐述每
     3.类对象的Class对象没有被引用（即没有通过反射引用该类的地方）
 
   永久代的回收并不是必须的，可以通过参数来设置是否对类进行回收。HotSpot提供-Xnoclassgc进行控制
-     使用-verbose，-XX:+TraceClassLoading、-XX:+TraceClassUnLoading可以查看类加载和卸载信息
-     -verbose、-XX:+TraceClassLoading可以在Product版HotSpot中使用；
-     -XX:+TraceClassUnLoading需要fastdebug版HotSpot支持
-     
+​     使用-verbose，-XX:+TraceClassLoading、-XX:+TraceClassUnLoading可以查看类加载和卸载信息
+​     -verbose、-XX:+TraceClassLoading可以在Product版HotSpot中使用；
+​     -XX:+TraceClassUnLoading需要fastdebug版HotSpot支持
+​     
  ** 更多了解，参考：http://www.cnblogs.com/zhguang/p/3257367.html **
 　　
 　　
