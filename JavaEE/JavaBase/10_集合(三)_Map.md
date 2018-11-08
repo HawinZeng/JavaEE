@@ -81,7 +81,7 @@ Entry接口：用于记录保存在Map中键值对，作为Entry实现类的一�
 
 HashMap,      TreeMap, EnumMap, WeakHashMap, IdentityHashMap,    Hashtable
 
-LinkedHashMap  ==========================================      Properties (对应项子类)
+LinkedHashMap  ==========================================   Properties (对应项子类)
 
 ### 2.1、HashMap
 
