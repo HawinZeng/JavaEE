@@ -43,11 +43,19 @@
 
 ###1.2、 File类的使用
 
-1. **构造方法**
+1. **构造方法** 
 
 - `public File(String pathname) ` ：通过将给定的**路径名字符串**转换为抽象路径名来创建新的 File实例。  
 - `public File(String parent, String child) ` ：从**父路径名字符串和子路径名字符串**创建新的 File实例。
 - `public File(File parent, String child)` ：从**父抽象路径名和子路径名字符串**创建新的 File实例。  
+
+> **new一个文件，有两种情况：**
+>
+> 1. 文件已存在硬盘，那么对内存的该文件对象系列操作，就不会有问题；
+>
+> 2. ##### 文件不存在硬盘，其实际是在内存中，那就不要轻易操作该文件，尽管自身不会引发nullPointerException。但是通过该文件，得到的对象一定是null对象！
+>
+> ##### 故，在操作文件前，一定要判断文件是否存在硬盘中，exist()方法；
 
 ```java
 // 文件路径名
@@ -80,9 +88,12 @@ File file4 = new File(parentDir, child);
 - 获取功能方法：
 
   - `public String getAbsolutePath() ` ：返回此File的绝对路径名字符串。
+  - `public String getCanonicalPath()`：返回File的标准路径名字符串；
   - ` public String getPath() ` ：将此File转换为路径名字符串。 
   - `public String getName()`  ：返回由此File表示的文件或目录的名称。  
   - `public long length()`  ：返回由此File表示的文件的长度。 
+
+  1. 
 
 - 判断功能的方法
 
@@ -94,8 +105,53 @@ File file4 = new File(parentDir, child);
 - 创建删除功能的方法
 
   - `public String[] list()` ：返回一个String数组，表示该File目录中的所有子文件或目录。
-
   - `public File[] listFiles()` ：返回一个File数组，表示该File目录中的所有的子文件或目录。  
+
+3. #### 举例重点：
+
+- 在当前目录下new 一个文件
+
+```
+// 1. 直接文件，非文件夹
+File file = new File("mm.txt");
+System.out.println(file.getAbsolutePath());// .../day11/02_代码/day11-code/mm.txt
+System.out.println(file.getCanonicalPath());// .../day11/02_代码/day11-code/mm.txt
+System.out.println(file.getPath()); // mm.txt
+System.out.println(file.getName());// mm.txt
+if(!file.exists()){
+    file.mkdir(); // 把当前文件当成一个directory创建，不创建上级目录，也就是父级目录不存在，此法无效；
+    file.mkdirs();// 与上面方法一致，它还同时把父级目录一并创建。开发时，常用此法，保证文件目录必创建；
+    createNewFile();// 才是创建该文件，而不是directory；是文件一定要用此法；
+}
+
+// 2. 错误写法，带文件夹的文件，但是父级文件夹不存在。new就疯了。
+File file = new File("/test/mm.txt"); 
+System.out.println(file.getAbsolutePath());//  /test/mm.txt
+System.out.println(file.getCanonicalPath());// /test/mm.txt
+System.out.println(file.getPath()); // /test/mm.txt
+file.mkdirs(); // 可以成功创建，是在当前目录下创建一个 test／mm.txt的非正常的文件夹，一般情况是打不开，将后缀去掉，才可以打开；
+
+// 3. 正确写法，带文件夹的文件，但是父级文件夹不存在。
+File file = new File("test/mm.txt"); 
+System.out.println(file.getAbsolutePath());//  ../day11/02_代码/day11-code//test/mm.txt
+System.out.println(file.getCanonicalPath());// ../day11/02_代码/day11-code//test/mm.txt
+System.out.println(file.getPath()); // test/mm.txt
+System.out.println(file.getName());// mm.txt --- 这个依然不变
+```
+
+> **getAbsolutePath vs getCanonicalPath 好像没有区别；其实有区别，参考如下：**
+>
+> File directory = new File("."); 
+> directory.getCanonicalPath(); //得到的是C:/test 
+> directory.getAbsolutePath();    //得到的是C:/test/. 
+> direcotry.getPath();                    //得到的是. 
+>
+> File directory = new File(".."); 
+> directory.getCanonicalPath(); //得到的是C:/ 
+> directory.getAbsolutePath();    //得到的是C:/test/.. 
+> direcotry.getPath();                    //得到的是.. 
+
+- new 任意一个文件，非当前目录下 －－－－> 一定是绝对路径**
 
 
 
@@ -113,20 +169,23 @@ File file4 = new File(parentDir, child);
   - 在递归中虽然有限定条件，但是递归次数不能太多。否则也会发生栈内存溢出。
   - 构造方法,禁止递归
 
-#### 2.2、递归打印多级目录
+#### 2.2、递归打印文件夹下多级子目录
 
 ```java
-static void printDir(File file){
-		if(file.isFile()){
-			System.out.println(file.getAbsoluteFile());
-			return;
-		}
-		File[] fileList = file.listFiles();
-		for(File f:fileList){
-			if(f.isDirectory()) System.out.println(f.getAbsoluteFile());
-			printDir(f);
-		}
-	}
+    static void getAllFile(File dir){ //传入的肯定是目录
+        File[] fileList = dir.listFiles(); // 若目录不存在，则fileList是null
+        if(fileList == null || fileList.length == 0){
+            return;
+        }
+        for(File f:fileList){
+            if(f.isDirectory()) {
+                System.out.println(f.getAbsoluteFile());
+                getAllFile(f);
+            }else{
+                System.out.println(f.getAbsoluteFile());
+            }
+        }
+    }
 ```
 
 ## 三、文件搜索
@@ -136,20 +195,22 @@ static void printDir(File file){
 搜索目标目录下以`.java`结尾的文件！
 
 ```java
-	static void printDir(File file){
-		String pathName = file.getAbsolutePath();
-		if(pathName.endsWith(".java")){
-			System.out.println(pathName);
-			return;
-		}
+    static void printDir(File file) {
+        String pathName = file.getAbsolutePath();
+        if (pathName.endsWith(".java")) {
+            System.out.println(pathName);
+            return;
+        }
 
-		if(file.isDirectory()){
-			File[] fileList = file.listFiles();
-			for(File f:fileList){
-				printDir(f);
-			}
-		}
-	}
+        if (file.isFile()) return;
+
+        File[] fileList = file.listFiles();
+        if (null != fileList) {
+            for (File f : fileList) {
+                printDir(f);
+            }
+        }
+    }
 ```
 
 ### 3.2、文件过滤器
@@ -262,13 +323,13 @@ Java中I/O操作主要是指使用`java.io`包下的内容，进行输入、输�
 
 >- **写入数据的原理**(内存-->硬盘)
 >
->​    java程序-->JVM(java虚拟机)-->OS(操作系统)-->OS调用写数据的方法-->把数据写入到文件中
+>​    java程序-->JVM(java虚拟机)-->OS(操作系统)-->OS调用IO写数据的方法-->把数据写入到文件中
 >
 >- **字节输出流的使用步骤**(重点):
 >
 >​    1.创建一个FileOutputStream对象,构造方法中传递写入数据的目的地
->    2.调用FileOutputStream对象中的方法write,把数据写入到文件中
->    3.释放资源(流使用会占用一定的内存,使用完毕要把内存清空,提供程序的效率)
+>​    2.调用FileOutputStream对象中的方法write,把数据写入到文件中
+>​    3.释放资源(流使用会占用一定的内存,使用完毕要把内存清空,提供程序的效率)
 
 #### 1.2、写出字节：
 
@@ -346,10 +407,10 @@ Java中I/O操作主要是指使用`java.io`包下的内容，进行输入、输�
 - int read(btye[] b)：多个读取
 
   > 1.方法的参数byte[]的作用?
-  >     起到缓冲作用,存储每次读取到的多个字节
-  >     数组的长度一把定义为1024(1kb)或者1024的整数倍
+  > ​    起到缓冲作用,存储每次读取到的多个字节
+  > ​    数组的长度一把定义为1024(1kb)或者1024的整数倍
   > 2.方法的返回值int是什么?
-  >     每次读取的有效字节个数
+  > ​    每次读取的有效字节个数
 
 - 最后一个字节为-1，即fis.read()==-1,
 
