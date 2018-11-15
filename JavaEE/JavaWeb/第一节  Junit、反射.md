@@ -95,7 +95,31 @@
 
 > 从上图看，类加载器ClassLoader就是利用反射机制，将Person类的各个属性部分封装成了Class类对象中对应的各个对象部分，如Field[]、Constructor[]、Method[]。
 
+**思考：类型转换中，强转为什么能转换成功？**前提是父子类关系，父类引用子类对象时可以强转成功；
 
+其内部核心，也是通过反射去check运行时类型，即 RRTI （Ru-Time Type Identification）运行时类别识别；
+
+在JDK 5开始，新增了一种强转：
+
+```java
+Animal animal= new Dog();
+//这两句等同于Dog dog = (Dog) animal;
+Class<Dog> dogType = Dog.class;
+Dog dog = dogType.cast(animal)
+
+public T cast(Object obj) {
+    // isInstance 等效于 instanceOf
+    if (obj != null && !isInstance(obj))  
+         throw new ClassCastException(cannotCastMsg(obj));
+     return (T) obj;
+}
+```
+
+> 扩展：instanceOf底层实现原理
+>
+> 1. 当JVM接收到instaceOf指令后，那么就会将obj从stack取出来，得到两个索引值indexbyte1,indexbyte2，是为了构建对象对应class在运行时常量池的index索引，找到obj的最终类型；
+> 2. 找到最终类S，然后就根据规则，判断S,T的类型是否能转换；
+> 3. 若obj是null，那么就不会做相应转换，直接返回0给Stack，即false；
 
 ### 2.2、反射的使用
 
@@ -373,13 +397,165 @@ public interface MyAnno extends java.lang.annotation.Annotation {
 
 在程序使用(解析)注解：获取注解中定义的属性值。
 
+- 使用步骤：
+
 1. 获取注解定义的位置的对象（Class，Method，Field）
 
+2. 获取指定的注解: An a = clazz.getAnnotation(An.class);
+3. 调用注解中的抽象方法获取配置的属性值;
+
+```java
+@An(className = "cn.itcast.alolo.MyAnn",methodName = "sub")
+public class AnnotationTest {
+    public static void main(String[] args) throws Exception {
+
+        Class<AnnotationTest> clazz = AnnotationTest.class;
+         // 这个方法，其实际就是将得到注解接口的一个实现类
+        An a = clazz.getAnnotation(An.class);
+
+        String className = a.className();
+        String methodName = a.methodName();
+
+        System.out.println(className);
+        System.out.println(methodName);
+
+        Class<?> cls = Class.forName(className);
+        Constructor con= cls.getConstructor(String.class);
+        Method method = cls.getMethod(methodName,int.class,int.class);
+        Object obj = con.newInstance("test");
+        
+        Object result = method.invoke(obj,10,2);
+        System.out.println(methodName+" result= "+result);
+    }
+}
+
+public class MyAnn {
+    private String name;
+
+    public MyAnn(String name){
+        this.name = name;
+    }
 
 
-### 3.6、注解测试框架 ／注解总结
+    public void show(){
+        System.out.println("MyAnn to show message!!!!");
+    }
 
+    public int sub(int a,int b){
+        System.out.println("MyAnn name = "+name);
+        return a-b;
+    }
+}
 
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface An {
+    String className();
+    String methodName();
+}
+```
+
+>**class.getAnnotation(An.class)原理：**
+>
+>```java
+>public class AnImpl implements An{
+>    public String className(){
+>        return "cn.itcast.alolo.MyAnn";
+>    }
+>    public String methodName(){
+>        return "sub";
+>    }
+>}
+>```
+
+### 3.6、注解总结 / 注解测试框架
+
+**总结：**
+
+1. 以后大多数时候，我们会使用注解，而不是自定义注解；
+2. 注解给谁用？
+   - 给编译器使用，如@Override，@FunctionalInterface用于编译器检测；
+   - 给解析程序使用，如下面的注解测试框架，其注解代表测试整个过程的解析；
+3. 注解不是程序的一部分，可以理解为注解就是一个标签
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Check {
+
+}
+
+public class TestCheck {
+    public static void main(String[] args) throws IOException {
+        //1.创建计算器对象
+        Calculator c = new Calculator();
+        //2.获取字节码文件对象
+        Class cls = c.getClass();
+        //3.获取所有方法
+        Method[] methods = cls.getMethods();
+
+        int number = 0;//出现异常的次数
+        BufferedWriter bw = new BufferedWriter(new FileWriter("bug.txt"));
+        
+        for (Method method : methods) {
+            //4.判断方法上是否有Check注解
+            if(method.isAnnotationPresent(Check.class)){
+                //5.有，执行
+                try {
+                    method.invoke(c);
+                } catch (Exception e) {
+                    //6.捕获异常
+
+                    //记录到文件中
+                    number ++;
+
+                    bw.write(method.getName()+ " 方法出异常了");
+                    bw.newLine();
+                    bw.write("异常的名称:" + e.getCause().getClass().getSimpleName());
+                    bw.newLine();
+                    bw.write("异常的原因:"+e.getCause().getMessage());
+                    bw.newLine();
+                    bw.write("--------------------------");
+                    bw.newLine();
+
+                }
+            }
+        }
+        bw.write("本次测试一共出现 "+number+" 次异常");
+        bw.flush();
+        bw.close();
+    }
+}
+
+public class Calculator {
+    //加法
+    @Check
+    public void add(){
+        String str = null;
+        str.toString();
+        System.out.println("1 + 0 =" + (1 + 0));
+    }
+    //减法
+    @Check
+    public void sub(){
+        System.out.println("1 - 0 =" + (1 - 0));
+    }
+    //乘法
+    @Check
+    public void mul(){
+        System.out.println("1 * 0 =" + (1 * 0));
+    }
+    //除法
+    @Check
+    public void div(){
+        System.out.println("1 / 0 =" + (1 / 0));
+    }
+    
+    public void show(){
+        System.out.println("永无bug...");
+    }
+}
+```
 
 
 
