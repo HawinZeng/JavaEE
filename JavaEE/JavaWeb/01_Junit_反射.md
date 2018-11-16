@@ -115,11 +115,28 @@ public T cast(Object obj) {
 }
 ```
 
-> 扩展：instanceOf底层实现原理
+> 扩展：`obj instanceOf A` 底层实现原理
 >
-> 1. 当JVM接收到instaceOf指令后，那么就会将obj从stack取出来，得到两个索引值indexbyte1,indexbyte2，是为了构建对象对应class在运行时常量池的index索引，找到obj的最终类型；
-> 2. 找到最终类S，然后就根据规则，判断S,T的类型是否能转换；
-> 3. 若obj是null，那么就不会做相应转换，直接返回0给Stack，即false；
+> 1. 当JVM接收到instaceOf指令后，那么就会将obj从stack取出来，得到两个索引值indexbyte1,indexbyte2，是为了构建对象对应class在运行时常量池的index索引，找到obj的最终类型class S；
+> 2. A的转化，Class loader of A is used to created class T by `N`(the name `N` consists of the construction in the method area of the Java Virtual Machine )－> 对应的具体class T，然后就根据规则，判断S,T的类型是否能转换, 能转化则instanceOf指令返回1给stack，否则返回0；
+> 3. 规则：S,T是同一类型，或者S是T的子类／T接口的继承接口／实现类；
+> 4. 若obj是null，那么就不会做相应转换，直接返回0给Stack，即false；
+> 5.  为什么使用instanceOf运算符？避免强转时发生类型转换异常错误ClassCastException;
+> 6. 若是能依据上下文推断类型，则会在编译阶段直接判断，而不需到运行时去比较类型；
+> 7. 什么情况会导致无法依据上下文推导呢？如反射newInstance对象，从硬盘持久化读取对象， 在方法中形参与实参不同类型替换后等；
+>
+> ```java
+> public static void main(String[] args){
+>     A a = new A();
+> 	test(a);
+> }
+> 
+> public static void test(Object b){ // 经过了Object替换后，无法依据上下文推导
+>     if(b instanceOf A){ ... } 
+> }
+> ```
+>
+> 相关链接：https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.instanceof
 
 ### 2.2、反射的使用
 
