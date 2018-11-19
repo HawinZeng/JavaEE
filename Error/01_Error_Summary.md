@@ -33,3 +33,20 @@ Inspection info: Signals places where an unchecked warning is issued by the comp
 
 
 
+issue-03:
+
+```
+ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.
+```
+
+> 1、 修改用户密码
+> mysql> alter user 'root'@'localhost' identified by 'youpassword';  
+>
+> 或者       
+>
+> mysql> set password=password("youpassword");
+>
+> 2、刷新权限
+>
+> mysql> flush privileges;
+
