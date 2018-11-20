@@ -71,7 +71,7 @@ sudo rm -rf /var/db/receipts/com.mysql.*
 
 - 手动。
 - cmd--> services.msc 打开服务的窗口
-- 使用管理员打开cmd
+- 使用管理员打开cmd ----(**启动DOS命令不需要；结束，并非sql语句**)
   - net start mysql : 启动mysql的服务
   - net stop mysql:关闭mysql服务
 
@@ -324,7 +324,7 @@ insert into 表名(列名1,列名2,...列名n) values(值1,值2,...值n);
 > 1. 列名和值要一一对应。
 > 2. 如果表名后，不定义列名，则默认给所有列添加值
 >
-> ​	insert into 表名 values(值1,值2,...值n);
+> 		insert into 表名 values(值1,值2,...值n);
 >
 > 3. 除了数字类型，其他类型需要使用引号(单双都可以)引起来
 
