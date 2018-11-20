@@ -33,7 +33,7 @@ Inspection info: Signals places where an unchecked warning is issued by the comp
 
 
 
-issue-03:
+**issue-03:**
 
 ```
 ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.

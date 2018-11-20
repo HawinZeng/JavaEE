@@ -313,8 +313,7 @@ drop table  if exists 表名 ;
 
 ### 4.3、DML：增删改【表】中数据
 
-<<<<<<< HEAD
-- 添加数据：
+- ##### 添加数据：
 
 ```sql
 insert into 表名(列名1,列名2,...列名n) values(值1,值2,...值n);
@@ -329,7 +328,7 @@ insert into 表名(列名1,列名2,...列名n) values(值1,值2,...值n);
 >
 > 3. 除了数字类型，其他类型需要使用引号(单双都可以)引起来
 
-- 删除数据：
+- ##### 删除数据：
 
 ```sql
 delete from 表名 [where 条件]
@@ -340,9 +339,12 @@ delete from 表名 [where 条件]
 > 1. 如果不加条件，则删除表中所有记录。
 > 2. 如果要删除所有记录
 >    - delete from 表名; -- 不推荐使用。有多少条记录就会执行多少次删除操作
->    - TRUNCATE TABLE 表名; -- 推荐使用，效率更高 先删除表，然后再创建一张一样的表。
+>
+>    - TRUNCATE TABLE 表名; -- 推荐使用，效率更高 先删除表，然后再创建一张一样的表。 
+>
+>      -- **此法若有外键关联，执行无效；**
 
-- 修改数据：
+- ##### 修改数据：
 
 ```sql
 update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
@@ -397,7 +399,7 @@ update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
 
 - #### 条件查询--where子句后跟条件
 
-  - ##### **运算符**
+  - #### **运算符**
 
   ```sql
   	* > 、< 、<= 、>= 、= 、[<>、!=]不等于
@@ -424,7 +426,7 @@ update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
   	
   ```
 
-  - 排序查询
+  - #### 排序查询
 
   ```sql
   1. order by 子句
@@ -440,21 +442,61 @@ update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
   SELECT math,english FROM stu ORDER BY math ASC, english DESC;
   ```
 
-  - 聚合函数：将一列数据作为一个整体，进行纵向的计算。
+  - #### 聚合函数：将一列数据作为一个整体，进行［纵向］的计算。
 
-  ```
+  ```sql
   1. count：计算个数
   		1. 一般选择非空的列：主键
   		2. count(*)
-  	2. max：计算最大值
-  	3. min：计算最小值
-  	4. sum：计算和
-  	5. avg：计算平均值
+  		
+  select count(english) from stu0;
+  select count(*) from stu0;
+  
+  2. max：计算最大值
+  3. min：计算最小值
+  4. sum：计算和
+  5. avg：计算平均值
+  select max(math) from stu0;
+  
+  注意：聚合函数的计算，排除null值。
+  		解决方案：
+  			1. 选择不包含非空的列进行计算
+  			2. IFNULL函数
   ```
 
-  - 分组查询
-  - 分页查询
-=======
+  - #### 分组查询:
+
+  ```sql
+  group by 分组字段；
+  
+  注意：
+  	1. 分组之后查询的字段：［分组字段、聚合函数］
+  	select sex,avg(math) from stu group by sex;
+  	
+  	2. where 和 having 的区别？
+  		2.1. where 在分组之前进行限定，如果不满足条件，则不参与分组。having在分组之后进行限定，如果不满足结果，则不会被查询出来
+  		2.2. where 后不可以跟聚合函数，having可以进行聚合函数的判断。
+  select sex,COUNT(id) ct,avg(math) from stu where math >=70 GROUP BY sex HAVING ct > 5;
+  ```
+
+  - #### 分页查询
+
+  ```sql
+  limit 开始的索引,每页查询的条数;
+  
+   公式：开始的索引 = （当前的页码 - 1） * 每页显示的条数
+  		-- 每页显示3条记录 
+  
+  		SELECT * FROM student LIMIT 0,3; -- 第1页
+  		
+  		SELECT * FROM student LIMIT 3,3; -- 第2页
+  		
+  		SELECT * FROM student LIMIT 6,3; -- 第3页
+  
+   limit 是一个MySQL"方言",只能在MySQL使用；
+  
+  ```
+
 
 
 ```sql
@@ -464,7 +506,3 @@ insert into stu values( 2,'张无忌',25,'成都',89,92),( 3,'赵敏',24,'北京
 (10,'杨康',44,'西安',78,65),(11,'欧阳锋',60,'西安',34,58),(12,'老顽童',58,'郑州',23,36),
 ( 13,'龙哥',35,'上海',69,72),( 14,'徐子龙',15,'上海',88,80);
 ```
-
-
-
->>>>>>> 6d1f5b3187d311e37b50488c42fb3199b6162be4
