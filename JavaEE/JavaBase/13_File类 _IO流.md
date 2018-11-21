@@ -111,7 +111,7 @@ File file4 = new File(parentDir, child);
 
 - 在当前目录下new 一个文件
 
-```
+```java
 // 1. 直接文件，非文件夹
 File file = new File("mm.txt");
 System.out.println(file.getAbsolutePath());// .../day11/02_代码/day11-code/mm.txt

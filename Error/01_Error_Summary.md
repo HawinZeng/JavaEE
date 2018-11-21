@@ -50,3 +50,43 @@ ERROR 1820 (HY000): You must reset your password using ALTER USER statement befo
 >
 > mysql> flush privileges;
 
+
+
+**issue-04:**
+
+```java
+'catch' branch identical to 'ClassNotFoundException' branch less... 
+
+Inspection info: Reports identical catch sections in try blocks under JDK 7. A quickfix is available to collapse the sections into a multi-catch section.
+This inspection only reports if the project or module is configured to use a language level of 7.0 or higher.
+    
+    try {
+            Properties pro = new Properties();
+            ClassLoader classLoader = JDBCUtils.class.getClassLoader();
+            URL resource = classLoader.getResource("jdbc.properties");
+            assert resource != null;
+            String path1 = resource.getPath();
+            System.out.println(path1);
+            pro.load(new FileReader(path1));
+            url = pro.getProperty("url");
+            user = pro.getProperty("user");
+            password = pro.getProperty("password");
+            Class.forName(pro.getProperty("driver"));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) { // ISSUE point
+            e.printStackTrace();
+        }
+```
+
+> Resolution:
+>
+> the same warning in IntelliJ (and I think you're using IntelliJ too), why not let Alt+Enter (or Option+Return if you rather) show you what it means?
+>
+> ```java
+> try {
+> 	...
+> }catch(ClassNotFoundException | IOException e){
+>       e.printStackTrace();
+> }
+> ```
