@@ -50,7 +50,7 @@ JavaScript = ECMAScript + JavaScript自己特有的东西(BOM+DOM) －－>三部
 
 - **数据类型：分2类**
 
-  1. 原始数据类型(基本数据类型)：
+  1. 原始数据类型(基本数据类型)：5种类型
      - number：数字。 整数/小数/NaN(not a number 一个不是数字的数字类型)
      - string：字符串。 字符串  "abc" "a" 'abc'  (没有字符的概念，全都是字符串)
      - boolean：true / false
@@ -68,9 +68,77 @@ JavaScript = ECMAScript + JavaScript自己特有的东西(BOM+DOM) －－>三部
   ```javascript
   语法：关键字 var
   var name ＝ 初始化值;
+  
+  typeof运算符：获取变量的类型。[注：null运算后得到的是object]
   ```
 
+- **运算符**
 
+  1. 一元运算符：只有一个运算数的运算符
+
+     ++，-- ， +(正号) 
+
+     > 注意：在JS中，如果运算数不是运算符所要求的类型，那么js引擎会自动的将运算数进行类型转换;
+     >
+     > 其他类型转number：
+     >
+     > ​	string转number：按照字面值转换。如果字面值不是数字，则转为NaN（不是数字的数字）;
+     >
+     > ​	boolean转number：true转为1，false转为0;
+     >
+     > ```javascript
+     > var a = +'123'; // 这个就是一个number 123；
+     > var b = +"abc"; // NaN . 参与运算还是NaN 即 NaN+1 --> NaN
+     > var c = +true; // 1
+     > ```
+
+  2. 算数运算符：+ - * / % ...
+
+  3. 赋值运算符：= += -+....
+
+  4. 比较运算符：>,<,>=, <=,==,===(全等于) **［java中只允许同类型比较，但是js可以不同类型比较］**
+
+     - 类型相同：直接比较
+
+       ( 字符串：按照字典顺序比较。按位逐一比较，直到得出大小为止。)
+
+     - 类型不同：先进行类型转换，再比较
+
+       ( ===：全等于。在比较之前，先判断类型，如果类型不一样，则直接返回false 。)
+
+     ```javascript
+     document.write("abc" < "acd"); // true
+     document.write("123" < 122); // false
+     document.write("123" == 123); // true,自动转换类型
+     document.write("123" === 123); // false, 不会转换类型
+     ```
+
+  5. 逻辑运算符：&& || !
+
+     其他类型转boolean：
+
+     - number：0或NaN为假，其他为真
+
+     - string：除了空字符串("")，其他都是true
+
+     - null&undefined:都是false
+
+     - 对象：所有对象都为true
+
+     ```javascript
+     使用&&、||时，一定要清楚两侧就是一个boolean值了，而如下操作是错误，但是还是有意义所在的：
+     document.write((0 && 3)+"<br>"); // 0 -- 0(false)
+     document.write((3 && 0)+"<br>"); // 0- 0(false)
+     
+     document.write((0 || 3)+"<br>"); // 3 -- 3(true)
+     
+     document.write((null || 3)+"<br>"); // 3 -- 3(true)
+     document.write((null && 3)+"<br>"); // null --null(false)
+     ```
+
+  6. 
+
+- 
 
 
 
