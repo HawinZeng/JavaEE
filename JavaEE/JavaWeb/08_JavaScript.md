@@ -1,4 +1,4 @@
-# 第 八节 JavaScript
+# 第 八节 JavaScript 初步
 
 ## 一、概述
 
@@ -24,128 +24,355 @@ JavaScript = ECMAScript + JavaScript自己特有的东西(BOM+DOM) －－>三部
 
 
 
-## 二、ECMAScript：客户端脚本语言的标准
+## 二、ECMAScript--基本语法：
 
-### 2.1、基本语法：
+ECMAScript：客户端脚本语言的标准
 
-- **与html结合方式：**
+#### 2.1、与html结合方式：
 
-  1. 内部JS：定义`<script>`，标签体内容就是js代码
-  2. 外部JS：定义`<script>`，通过src属性引入外部的js文件
+1. 内部JS：定义`<script>`，标签体内容就是js代码
+2. 外部JS：定义`<script>`，通过src属性引入外部的js文件
 
-  > 注意：
-  > ```javascript
-  > 1. <script>可以定义在html页面的任何地方。但是定义的位置会影响执行顺序。
-  > 2. <script>可以定义多个。
-  > 
-  > <script>
-  >     alert("Hello JavaScript!");
-  > </script>
-  > ```
+> 注意：
+> ```javascript
+> 1. <script>可以定义在html页面的任何地方。但是定义的位置会影响执行顺序。
+> 2. <script>可以定义多个。
+> 
+> <script>
+>     alert("Hello JavaScript!");
+> </script>
+> ```
 
-- **注释：同java，没有文档注释**
+#### 2.2、注释：同java，没有文档注释
 
-  1. 单行注释 //
-  2. 多行注释 /*多行注释 */
+1. 单行注释 //
+2. 多行注释 /*多行注释 */
 
-- **数据类型：分2类**
+#### 2.3、数据类型：分2类
 
-  1. 原始数据类型(基本数据类型)：5种类型
-     - number：数字。 整数/小数/NaN(not a number 一个不是数字的数字类型)
-     - string：字符串。 字符串  "abc" "a" 'abc'  (没有字符的概念，全都是字符串)
-     - boolean：true / false
-     - null：一个对象为空的占位符
-     - undefined：未定义。如果一个变量没有给初始化值，则会被默认赋值为undefined
-  2. 引用数据类型：对象
+1. 原始数据类型(基本数据类型)：5种类型
+   - number：数字。 整数/小数/NaN(not a number 一个不是数字的数字类型)
+   - string：字符串。 字符串  "abc" "a" 'abc'  (没有字符的概念，全都是字符串)
+   - boolean：true / false
+   - null：一个对象为空的占位符
+   - undefined：未定义。如果一个变量没有给初始化值，则会被默认赋值为undefined
+2. 引用数据类型：对象
 
-- **变量：一小块存储数据的内存空间**
+#### 2.4、变量：一小块存储数据的内存空间
 
-  Java语言是强类型语言，而JavaScript是弱类型语言。
+Java语言是强类型语言，而JavaScript是弱类型语言。
 
-  - **强类型：**在开辟变量存储空间时，定义了空间将来存储的数据的数据类型。只能存储固定类型的数据。
-  - **弱类型：**在开辟变量存储空间时，不定义空间将来的存储数据类型，可以存放任意类型的数据。
+- **强类型：**在开辟变量存储空间时，定义了空间将来存储的数据的数据类型。只能存储固定类型的数据。
+- **弱类型：**在开辟变量存储空间时，不定义空间将来的存储数据类型，可以存放任意类型的数据。
 
-  ```javascript
-  语法：关键字 var
-  var name ＝ 初始化值;
-  
-  typeof运算符：获取变量的类型。[注：null运算后得到的是object]
-  ```
+```javascript
+语法：关键字 var
+var name ＝ 初始化值;
 
-- **运算符**
+typeof运算符：获取变量的类型。[注：null运算后得到的是object]
+```
 
-  1. 一元运算符：只有一个运算数的运算符
+#### 2.5、运算符
 
-     ++，-- ， +(正号) 
+1. 一元运算符：只有一个运算数的运算符
 
-     > 注意：在JS中，如果运算数不是运算符所要求的类型，那么js引擎会自动的将运算数进行类型转换;
-     >
-     > 其他类型转number：
-     >
-     > ​	string转number：按照字面值转换。如果字面值不是数字，则转为NaN（不是数字的数字）;
-     >
-     > ​	boolean转number：true转为1，false转为0;
-     >
-     > ```javascript
-     > var a = +'123'; // 这个就是一个number 123；
-     > var b = +"abc"; // NaN . 参与运算还是NaN 即 NaN+1 --> NaN
-     > var c = +true; // 1
-     > ```
+   ++，-- ， +(正号) 
 
-  2. 算数运算符：+ - * / % ...
+   > 注意：在JS中，如果运算数不是运算符所要求的类型，那么js引擎会自动的将运算数进行类型转换;
+   >
+   > 其他类型转number：
+   >
+   > ​	string转number：按照字面值转换。如果字面值不是数字，则转为NaN（不是数字的数字）;
+   >
+   > ​	boolean转number：true转为1，false转为0;
+   >
+   > ```javascript
+   > var a = +'123'; // 这个就是一个number 123；
+   > var b = +"abc"; // NaN . 参与运算还是NaN 即 NaN+1 --> NaN
+   > var c = +true; // 1
+   > ```
 
-  3. 赋值运算符：= += -+....
+2. 算数运算符：+ - * / % ...
 
-  4. 比较运算符：>,<,>=, <=,==,===(全等于) **［java中只允许同类型比较，但是js可以不同类型比较］**
+3. 赋值运算符：= += -+....
 
-     - 类型相同：直接比较
+4. 比较运算符：>,<,>=, <=,==,===(全等于) **［java中只允许同类型比较，但是js可以不同类型比较］**
 
-       ( 字符串：按照字典顺序比较。按位逐一比较，直到得出大小为止。)
+   - 类型相同：直接比较
 
-     - 类型不同：先进行类型转换，再比较
+     ( 字符串：按照字典顺序比较。按位逐一比较，直到得出大小为止。)
 
-       ( ===：全等于。在比较之前，先判断类型，如果类型不一样，则直接返回false 。)
+   - 类型不同：先进行类型转换，再比较
 
-     ```javascript
-     document.write("abc" < "acd"); // true
-     document.write("123" < 122); // false
-     document.write("123" == 123); // true,自动转换类型
-     document.write("123" === 123); // false, 不会转换类型
-     ```
+     ( ===：全等于。在比较之前，先判断类型，如果类型不一样，则直接返回false 。)
 
-  5. 逻辑运算符：&& || !
+   ```javascript
+   document.write("abc" < "acd"); // true
+   document.write("123" < 122); // false
+   document.write("123" == 123); // true,自动转换类型
+   document.write("123" === 123); // false, 不会转换类型
+   ```
 
-     其他类型转boolean：
+5. 逻辑运算符：&& || !
 
-     - number：0或NaN为假，其他为真
+   其他类型转boolean：
 
-     - string：除了空字符串("")，其他都是true
+   - number：0或NaN为假，其他为真
 
-     - null&undefined:都是false
+   - string：除了空字符串("")，其他都是true
 
-     - 对象：所有对象都为true
+   - null&undefined:都是false
 
-     ```javascript
-     使用&&、||时，一定要清楚两侧就是一个boolean值了，而如下操作是错误，但是还是有意义所在的：
-     document.write((0 && 3)+"<br>"); // 0 -- 0(false)
-     document.write((3 && 0)+"<br>"); // 0- 0(false)
-     
-     document.write((0 || 3)+"<br>"); // 3 -- 3(true)
-     
-     document.write((null || 3)+"<br>"); // 3 -- 3(true)
-     document.write((null && 3)+"<br>"); // null --null(false)
-     ```
+   - 对象：所有对象都为true
 
-  6. 
+   ```javascript
+   使用&&、||时，一定要清楚两侧就是一个boolean值了，而如下操作是错误，但是还是有意义所在的：
+   document.write((0 && 3)+"<br>"); // 0 -- 0(false)
+   document.write((3 && 0)+"<br>"); // 0- 0(false)
+   
+   document.write((0 || 3)+"<br>"); // 3 -- 3(true)
+   
+   document.write((null || 3)+"<br>"); // 3 -- 3(true)
+   document.write((null && 3)+"<br>"); // null --null(false)
+   ```
 
-- 
+6. 三元运算符：? : 表达式;
+
+   ```javascript
+    var c = a > b ? 1:0;
+   ```
+
+#### 2.6、JS特殊语法:
+
+1. 语句以;结尾，如果一行只有一条语句则 ;可以省略 (不建议)
+2. 变量的定义使用var关键字，也可以不使用;
+   - 用： 定义的变量是局部变量
+   -  不用：定义的变量是全局变量(不建议)
+
+```javascript
+function  fun() { 
+	b = 4; // 没有定义var，就是全局变量，下面alert也是可以使用的；
+}
+fun();
+alert(b);
+```
+
+#### 2.7、流程控制语句：
+
+1. if...else...
+2. switch:
+   * 在java中，switch语句可以接受的数据类型： byte int shor char,枚举(1.5) ,String(1.7)；
+   * **在JS中,switch语句可以接受任意的原始数据类型；**
+3. while
+4. do...while
+5. for
 
 
 
+## 三、ECMAScript--基本对象
 
 
 
+### 3.1、Function：函数(方法)对象
 
+#### 1）创建 : 3种形式，
+
+- var fun = new **Function**( 形式参数列表, 方法体 );  // 了解即可！！
+- **function** 方法名称  ( 形式参数列表 ) {
+  ​              方法体
+  }
+- var 方法名 = **function** ( 形式参数列表 )  {
+  ​             方法体
+  }
+
+#### 2）属性：
+
+​	length：代表形参的个数；
+
+#### 3）特点：
+
+- 方法定义是，形参的类型不用写,返回值类型也不写;
+- 方法是一个对象，如果定义名称相同的方法，会覆盖;
+- **在JS中，方法的调用只与方法的名称有关，和参数列表无关;**
+- **在方法声明中有一个隐藏的内置对象（数组），arguments,封装所有的实际参数;**
+
+#### 4）调用：方法名称(实际参数列表);
+
+
+
+### 3.2、Array:数组对象
+
+#### 1）创建：3种方式
+
+- var arr = new Array(元素列表);
+- var arr = new Array(默认长度);
+- var arr = [元素列表];
+
+#### 2）方法
+
+​	**join(params)**：将数组中的元素按照指定的分隔符拼接为字符串；
+
+​	**push(element)：**向数组的末尾添加一个或更多元素，并返回新的长度。
+
+#### 3）属性
+
+​	length：数组的长度；
+
+#### 4）特点：（与Java ArrayList相似）
+
+- JS中，数组元素的类型可变的；
+- JS中，数组长度可变的；
+
+
+
+### 3.3、Boolean、String、Number －－ 基本数据类型的包装类
+
+### 3.4、Date：日期对象
+
+#### 1）创建：var date = new Date();
+
+#### 2）方法：
+
+- toLocaleString()：返回当前date对象对应的时间本地字符串格式;
+- getTime():获取毫秒值。返回当前如期对象描述的时间到1970年1月1日零点的毫秒值差;
+
+
+
+### 3.5、Math：数学对象
+
+#### 1）创建：
+
+特点：Math对象不用创建，直接使用。  Math.方法名();
+
+#### 2）方法：（同Java中的Math）
+
+- random():返回 0 ~ 1 之间的随机数。 含0不含1; 
+- ceil(x)：对数进行上舍入;
+- floor(x)：对数进行下舍入;
+- round(x)：把数四舍五入为最接近的整数;
+- abs(x)：绝对值；
+
+```javascript
+// [1-10] 随机数
+/*
+ 1. 获取一个[0，1)的随机数a；
+ 2. a= a＊10 [0，9.99999]
+ 3. a= floor(a) [0,9]
+ 4. a+1 [1,10]
+*/
+for(var i=0;i<20;i++){
+     var c = Math.floor(Math.random()*10)+1;
+     document.write(c+"<br>");
+}
+```
+
+
+
+### 3.6、RegExp：正则表达式对象
+
+#### 1）正则表达式：定义字符串的组成规则。
+
+- 单个字符:[]
+
+  eg：[a]、[ab]、[a-zA-Z0-9_]
+
+  - 特殊符号代表特殊含义的单个字符:
+
+    \d: 单个数字字符 [0-9]
+
+    \w: 单个单词字符[a-zA-Z0-9_]
+
+- 量词符号：
+
+  ?：表示出现0次或1次
+  *：表示出现0次或多次
+  +：出现1次或多次
+  {m,n}:表示 m<= 数量 <= n
+
+  ​	m如果缺省： {,n}:最多n次
+
+  ​	n如果缺省：{m,} 最少m次
+
+- 开始结束符号：
+
+  - ^ : 开始
+  - $ : 结束
+
+#### 2）正则对象：（javaScript的主要应用对象）
+
+- 创建
+
+  var reg = new RegExp("正则表达式"); // 注意这种定义，反\转义特点，要小心使用，一般使用下面定义；
+
+  var reg = /正则表达式/;
+
+- 方法
+
+  test(params): 验证指定的字符串是否符合正则定义的规范	
+
+
+
+### 3.7、Global
+
+- 特点：全局对象，这个Global中封装的方法不需要对象就可以直接调用。  方法名();
+
+- 方法：
+
+  encodeURI():url编码
+  decodeURI():url解码
+
+```javascript
+var str = "http://www.baidu.com?wd=传智播客";
+
+var encode = encodeURI(str);
+document.write(encode+"<br>");
+// http://www.baidu.com?wd=%E4%BC%A0%E6%99%BA%E6%92%AD%E5%AE%A2
+var s = decodeURI(encode);
+document.write(s+"<br>");
+// http://www.baidu.com?wd=传智播客
+```
+
+​	encodeURIComponent():url编码,编码的字符更多
+​	decodeURIComponent():url解码
+
+```javascript
+var str = "http://www.baidu.com?wd=传智播客";
+
+var encode = encodeURIComponent(str);
+document.write(encode+"<br>");
+// http%3A%2F%2Fwww.baidu.com%3Fwd%3D%E4%BC%A0%E6%99%BA%E6%92%AD%E5%AE%A2
+var s = decodeURIComponent(encode);
+document.write(s+"<br>");
+// http://www.baidu.com?wd=传智播客
+```
+
+​	parseInt()：将字符串转为数字
+
+​		逐一判断每一个字符是否是数字，直到不是数字为止，将前边数字部分转为number；
+
+```javascript
+var a = 12+(+"123abc");
+document.write(a+"<br>");
+// NaN
+var b = 12 + (parseInt("123abc"));
+document.write(b+"<br><br>")
+// 135
+```
+
+​	isNaN():判断一个值是否是NaN
+
+​		NaN六亲不认，连自己都不认。NaN参与的==比较全部问false；
+
+​	eval():讲 JavaScript 字符串，并把它作为脚本代码来执行。	
+
+```javascript
+var str = 'alert(123)';
+eval(str); // 即可执行该脚本的字符串命令；
+```
+
+- URL编码：
+
+  传智播客 =  %E4%BC%A0%E6%99%BA%E6%92%AD%E5%AE%A2
 
 
 
