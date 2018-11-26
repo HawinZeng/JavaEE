@@ -51,11 +51,11 @@ ECMAScript：客户端脚本语言的标准
 #### 2.3、数据类型：分2类
 
 1. 原始数据类型(基本数据类型)：5种类型
-   - number：数字。 整数/小数/NaN(not a number 一个不是数字的数字类型)
-   - string：字符串。 字符串  "abc" "a" 'abc'  (没有字符的概念，全都是字符串)
-   - boolean：true / false
-   - null：一个对象为空的占位符
-   - undefined：未定义。如果一个变量没有给初始化值，则会被默认赋值为undefined
+   - **number：**数字。 整数/小数/NaN(not a number 一个不是数字的数字类型)
+   - **string：**字符串。 字符串  "abc" "a" 'abc'  (没有字符的概念，全都是字符串)
+   - **boolean：**true / false
+   - **null：**一个对象为空的占位符
+   - **undefined：**未定义。如果一个变量没有给初始化值，则会被默认赋值为undefined
 2. 引用数据类型：对象
 
 #### 2.4、变量：一小块存储数据的内存空间
@@ -318,8 +318,8 @@ for(var i=0;i<20;i++){
 
 - 方法：
 
-  encodeURI():url编码
-  decodeURI():url解码
+  `encodeURI()`: url编码
+  `decodeURI()`: url解码
 
 ```javascript
 var str = "http://www.baidu.com?wd=传智播客";
@@ -332,8 +332,8 @@ document.write(s+"<br>");
 // http://www.baidu.com?wd=传智播客
 ```
 
-​	encodeURIComponent():url编码,编码的字符更多
-​	decodeURIComponent():url解码
+​	`encodeURIComponent()`: url编码,编码的字符更多
+​	`decodeURIComponent()`: url解码
 
 ```javascript
 var str = "http://www.baidu.com?wd=传智播客";
@@ -346,7 +346,7 @@ document.write(s+"<br>");
 // http://www.baidu.com?wd=传智播客
 ```
 
-​	parseInt()：将字符串转为数字
+​	`parseInt()`：将字符串转为数字
 
 ​		逐一判断每一个字符是否是数字，直到不是数字为止，将前边数字部分转为number；
 
@@ -359,20 +359,39 @@ document.write(b+"<br><br>")
 // 135
 ```
 
-​	isNaN():判断一个值是否是NaN
+​	`isNaN()`: 判断一个值是否是NaN
 
 ​		NaN六亲不认，连自己都不认。NaN参与的==比较全部问false；
 
-​	eval():讲 JavaScript 字符串，并把它作为脚本代码来执行。	
+​	`eval()`: 讲 JavaScript 字符串，并把它作为脚本代码来执行。	
 
 ```javascript
 var str = 'alert(123)';
 eval(str); // 即可执行该脚本的字符串命令；
 ```
 
-- URL编码：
+- **URL编码：**（针对汉字转换）
 
   传智播客 =  %E4%BC%A0%E6%99%BA%E6%92%AD%E5%AE%A2
+
+  编码原理：
+
+  ```java
+  public static void main(String[] args) {
+          // test 传智播客 bits
+     byte[] bytes = "传智播客".getBytes();
+     ArrayList<String> list = new ArrayList<>();
+     for(byte b:bytes){
+         list.add(Integer.toHexString(b));
+     }
+     System.out.println(Arrays.toString(bytes));
+     System.out.println(list);
+  }
+  ----------
+  [-28, -68, -96, -26, -103, -70, -26, -110, -83, -27, -82, -94]
+  [ffffffe4, ffffffbc, ffffffa0, ffffffe6, ffffff99, ffffffba, ffffffe6, ffffff92, ffffffad, ffffffe5, ffffffae, ffffffa2]
+  结论：URL编码实际是 "汉字的十六制编码取后2位，其余位用％号取代"
+  ```
 
 
 

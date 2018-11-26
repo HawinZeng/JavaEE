@@ -6,7 +6,7 @@
 
 ### 1.1、DOM
 
-```
+```javascript
 * 功能：控制html文档的内容
 * 获取页面标签(元素)对象：Element
 	* document.getElementById("id值"):通过元素的id获取元素对象
@@ -352,12 +352,332 @@ DOM ：Document Object Model 文档对象模型
 </script>
 ```
 
+#### 3.3.4、案例：动态表格
+
+```javascript
+// 方案一：使用XML－DOM对象编程
+document.getElementById("btn_add").onclick = function(){
+        //2.获取文本框的内容
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var gender = document.getElementById("gender").value;
+
+        //3.创建td，赋值td的标签体
+        //id 的 td
+        var td_id = document.createElement("td");
+        var text_id = document.createTextNode(id);
+        td_id.appendChild(text_id);
+        //name 的 td
+        var td_name = document.createElement("td");
+        var text_name = document.createTextNode(name);
+        td_name.appendChild(text_name);
+        //gender 的 td
+        var td_gender = document.createElement("td");
+        var text_gender = document.createTextNode(gender);
+        td_gender.appendChild(text_gender);
+        //a标签的td
+        var td_a = document.createElement("td");
+        var ele_a = document.createElement("a");
+        ele_a.setAttribute("href","javascript:void(0);");
+        ele_a.setAttribute("onclick","delTr(this);");
+        var text_a = document.createTextNode("删除");
+        ele_a.appendChild(text_a);
+        td_a.appendChild(ele_a);
+
+        //4.创建tr
+        var tr = document.createElement("tr");
+        //5.添加td到tr中
+        tr.appendChild(td_id);
+        tr.appendChild(td_name);
+        tr.appendChild(td_gender);
+        tr.appendChild(td_a);
+        //6.获取table
+        var table = document.getElementsByTagName("table")[0];
+        table.appendChild(tr);
+    }
+```
+
+```javascript
+// 方案二：HTML－DOM innerHTML属性应用(简单)
+document.getElementById("btn_add").onclick = function() {
+        //2.获取文本框的内容
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var gender = document.getElementById("gender").value;
+
+        //获取table
+        var table = document.getElementsByTagName("table")[0];
+
+        //追加一行
+        table.innerHTML += "<tr>\n" +
+            "        <td>"+id+"</td>\n" +
+            "        <td>"+name+"</td>\n" +
+            "        <td>"+gender+"</td>\n" +
+            "        <td><a href=\"javascript:void(0);\" onclick=\"delTr(this);\" >删除</a></td>\n" +
+            "    </tr>";
+    }
+
+    //删除方法
+    function delTr(obj){
+        var table = obj.parentNode.parentNode.parentNode;
+        var tr = obj.parentNode.parentNode;
+
+        table.removeChild(tr);
+    }
+```
 
 
 
+## 四、事件监听机制
+
+#### 4.1、概念：某些组件被执行了某些操作后，触发某些代码的执行。
+
+- **事件：**某些操作。如： 单击，双击，键盘按下了，鼠标移动了
+- **事件源：**组件。如： 按钮 文本输入框...
+- **监听器：**代码。
+- **注册监听：**将事件，事件源，监听器结合在一起。 当事件源上发生了事件，则触发执行监听器代码。
 
 
 
+#### 4.2、常见的事件：
+
+- 点击事件：
+  - onclick：单击事件
+  - ondblclick：双击事件
+- 焦点事件：
+  - onblur：失去焦点
+  - onfocus:元素获得焦点。
+- 加载事件：
+  - onload：一张页面或一幅图像完成加载。
+- 鼠标事件：
+  - onmousedown	鼠标按钮被按下。
+  - onmouseup	鼠标按键被松开。
+  - onmousemove	鼠标被移动。
+  - onmouseover	鼠标移到某元素之上。
+  - onmouseout	鼠标从某元素移开。
+- 键盘事件：
+  - onkeydown	某个键盘按键被按下。	
+  - onkeyup		某个键盘按键被松开。
+  - onkeypress	某个键盘按键被按下并松开。
+- 选择和改变：
+  - onchange	域的内容被改变。
+  - onselect	文本被选中。
+- 表单事件：
+  - onsubmit	确认按钮被点击。
+  - onreset	重置按钮被点击。
+
+
+
+## 五、事件案例
+
+1. #### 表格全选
+
+   ```html
+   <head>
+   ...
+       <style>
+   		...
+           .over{
+               background-color: pink;
+           }
+           .out{
+               background-color: white;
+           }
+       </style>
+   
+       <script>
+           window.onload = function () {
+               document.getElementById("selectAll").onclick = function(){
+                   var cbs = document.getElementsByName("cb");
+                   for(var i=0,length=cbs.length;i<length;i++){
+                       cbs[i].checked = true;
+                   }
+               };
+   
+               document.getElementById("unSelectAll").onclick = function(){
+                   var cbs = document.getElementsByName("cb");
+                   for(var i=0,length=cbs.length;i<length;i++){
+                       cbs[i].checked = false;
+                   }
+               };
+   
+               document.getElementById("selectRev").onclick = function(){
+                   var cbs = document.getElementsByName("cb");
+                   for(var i=0,length=cbs.length;i<length;i++){
+                       cbs[i].checked = !cbs[i].checked;
+                   }
+               };
+   
+               document.getElementById("cb1").onclick = function () {
+                   var cb1 = document.getElementById("cb1");
+                   var cbs  = document.getElementsByName("cb");
+                   for(var i=0,length=cbs.length;i<length;i++){
+                       cbs[i].checked = cb1.checked;
+                   }
+               }
+   
+               // 在onload中添加改变背景色，不能直接定义function给标签使用，而只能给标签添加onmouseover，onmouseout
+               var trs = document.getElementsByTagName("tr");
+               for(var i=0,length =trs.length;i<length;i++){
+                   trs[i].onmouseover = function () {
+                       this.style.backgroundColor = "blue";
+                   };
+   
+                   trs[i].onmouseout = function () {
+                       this.style.backgroundColor = "white";
+                   }
+               }
+   
+               // 低级写法！！！！比较low
+               // var cb1 = document.getElementById("cb1");
+               // var cb2 = document.getElementById("cb2");
+               // var cb3 = document.getElementById("cb3");
+               // var cb4 = document.getElementById("cb4");
+               //
+               // cb1.onclick = function () {
+               //     if(cb1.checked){
+               //         cb2.checked = true;
+               //         cb3.checked = true;
+               //         cb4.checked = true;
+               //     }else{
+               //         cb2.checked = false;
+               //         cb3.checked = false;
+               //         cb4.checked = false;
+               //     }
+               // };
+               //
+               // selectAll.onclick = function () {
+               //     cb1.checked = true;
+               //     cb2.checked = true;
+               //     cb3.checked = true;
+               //     cb4.checked = true;
+               // };
+               //
+               // unSelectAll.onclick  = function(){
+               //     cb1.checked = false;
+               //     cb2.checked = false;
+               //     cb3.checked = false;
+               //     cb4.checked = false;
+               // };
+               //
+               // selectRev.onclick = function () {
+               //     if(cb1.checked){
+               //         cb1.checked = false;
+               //     }else{
+               //         cb1.checked = true;
+               //     }
+               //     if(cb2.checked){
+               //         cb2.checked = false;
+               //     }else{
+               //         cb2.checked = true;
+               //     }
+               //     if(cb3.checked){
+               //         cb3.checked = false;
+               //     }else{
+               //         cb3.checked = true;
+               //     }
+               //     if(cb4.checked){
+               //         cb4.checked = false;
+               //     }else{
+               //         cb4.checked = true;
+               //     }
+               // };
+           };
+   		
+           // 这种写法，最后放在标签加载的后面，防止异常事故发生，一般可能没有问题，毕竟是绑定事件，要页面出来才能发生事件效果。
+           // function overTr(obj) {
+           //     obj.style.backgroundColor = "red";
+           //     // obj.className = "over";
+           // }
+           //
+           // function outTr(obj){
+           //     obj.style.backgroundColor = "white";
+           //     // obj.className = "out";
+           // }
+       </script>
+   </head>
+   <table>
+       <caption>学生信息表</caption>
+       <tr onmouseover="overTr(this);" onmouseout="outTr(this);">
+           <th><input type="checkbox" id="cb1" name="cb"></th>
+           <th>编号</th>
+           <th>姓名</th>
+           <th>性别</th>
+           <th>操作</th>
+       </tr>
+   
+       <tr onmouseover="overTr(this);" onmouseout="outTr(this);">
+           <td><input type="checkbox" id="cb2" name="cb"></td>
+           <td>1</td>
+           <td>令狐冲</td>
+           <td>男</td>
+           <td><a href="javascript:void(0);">删除</a></td>
+       </tr>
+   
+       <tr onmouseover="overTr(this);" onmouseout="outTr(this);">
+           <td><input type="checkbox" id="cb3" name="cb"></td>
+           <td>2</td>
+           <td>任我行</td>
+           <td>男</td>
+           <td><a href="javascript:void(0);">删除</a></td>
+       </tr>
+   
+       <tr onmouseover="overTr(this);" onmouseout="outTr(this);">
+           <td><input type="checkbox" id="cb4" name="cb"></td>
+           <td>3</td>
+           <td>岳不群</td>
+           <td>?</td>
+           <td><a href="javascript:void(0);">删除</a></td>
+       </tr>
+   </table>
+   <div>
+       <input type="button" id="selectAll" value="全选">
+       <input type="button" id="unSelectAll" value="全不选">
+       <input type="button" id="selectRev" value="反选">
+   </div>
+   ```
+
+2. #### 表单验证
+
+   ```html
+   <script>
+           window.onload = function () {
+               // 表单提交验证，默认是true，点击就提交。若接受返回值false则不提交；
+               document.getElementById("form").onsubmit = function () { 
+                   return checkUserName() && checkPassword();
+               };
+   			// 焦点消失
+               document.getElementById("username").onblur = checkUserName; 
+               document.getElementById("password").onblur = checkPassword;
+           };
+   
+           function checkUserName() {
+               var username = document.getElementById("username");
+               var reg  = /^\w{6,12}$/;
+               var flag = reg.test(username.value);
+               var e_username = document.getElementById("e_username");
+               if(flag){
+                   e_username.innerHTML = "<img width='25' height='25' src='img/gou.png'/>";
+               }else{
+                   e_username.innerHTML = "姓名输入格式有误";
+               }
+               return flag;
+           }
+   
+           function checkPassword() {
+               var password = document.getElementById("password");
+               var reg  = /^\w{6,12}$/;
+               var flag = reg.test(password.value);
+               var e_password = document.getElementById("e_password");
+               if(flag){
+                   e_password.innerHTML = "<img width='35' height='35' src='img/gou.png'/>";
+               }else{
+                   e_password.innerHTML = "密码输入格式有误";
+               }
+               return flag;
+           }
+       </script>
+   ```
 
 
 
