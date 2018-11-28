@@ -138,8 +138,8 @@ Screen：显示器屏幕对象
 
   - **`setTimeout()`:**	在指定的毫秒数后调用函数或计算表达式。
   - **`clearTimeout()`:**	取消由 setTimeout() 方法设置的 timeout。
-  - **`setInterval()`:**	按照指定的周期（以毫秒计）来调用函数或计算表达式。
-  - **`clearInterval()`:**	取消由 setInterval() 设置的 timeout。
+  	 **`setInterval()`:**	按照指定的周期（以毫秒计）来调用函数或计算表达式。
+  	 **`clearInterval()`:**	取消由 setInterval() 设置的 timeout。
 
   ```javascript
   <!--  轮播图 -->
@@ -319,7 +319,7 @@ DOM ：Document Object Model 文档对象模型
 - 特点：所有dom对象都可以被认为是一个节点
 - 方法：**CRUD dom树;**
   - appendChild()：向节点的子节点列表的结尾添加新的子节点。
-  - removeChild()	：删除（并返回）当前节点的指定子节点。
+  	 removeChild()	：删除（并返回）当前节点的指定子节点。
   -  replaceChild()：用新节点替换一个子节点。
 - 属性：parentNode 返回节点的父节点。
 
@@ -352,7 +352,37 @@ DOM ：Document Object Model 文档对象模型
 </script>
 ```
 
-#### 3.3.4、案例：动态表格
+
+
+### 3.4、HTML DOM
+
+1. 标签体的设置和获取：innerHTML--**[element.innerHTML]**
+
+2. 使用html元素对象的属性：**具体哪个标签具体分析，参考w3cschool；**
+
+3. 控制元素样式
+
+   - 使用元素的style属性来设置
+   - 提前定义好类选择器的样式，通过元素的className属性来设置其class属性值。
+
+   ```javascript
+   <div id="div1">div1</div>
+   <div id="div2">div2</div>
+       <script>
+           var div1 = document.getElementById("div1");
+           div1.onclick = function () {
+               div1.style.border = "1px solid red";
+               div1.style.width = "200px";
+           };
+   
+           var div2 = document.getElementById("div2");
+           div2.onclick = function () {
+               div2.className = "d1";
+           };
+       </script>
+   ```
+
+#### 3.4.1、案例：动态表格
 
 ```javascript
 // 方案一：使用XML－DOM对象编程
@@ -451,20 +481,20 @@ document.getElementById("btn_add").onclick = function() {
   - onload：一张页面或一幅图像完成加载。
 - 鼠标事件：
   - onmousedown	鼠标按钮被按下。
-  - onmouseup	鼠标按键被松开。
-  - onmousemove	鼠标被移动。
-  - onmouseover	鼠标移到某元素之上。
-  - onmouseout	鼠标从某元素移开。
+  	 onmouseup	鼠标按键被松开。
+  	 onmousemove	鼠标被移动。
+  	 onmouseover	鼠标移到某元素之上。
+  	 onmouseout	鼠标从某元素移开。
 - 键盘事件：
   - onkeydown	某个键盘按键被按下。	
-  - onkeyup		某个键盘按键被松开。
-  - onkeypress	某个键盘按键被按下并松开。
+  	 onkeyup		某个键盘按键被松开。
+  	 onkeypress	某个键盘按键被按下并松开。
 - 选择和改变：
   - onchange	域的内容被改变。
-  - onselect	文本被选中。
+  	 onselect	文本被选中。
 - 表单事件：
   - onsubmit	确认按钮被点击。
-  - onreset	重置按钮被点击。
+  	 onreset	重置按钮被点击。
 
 
 
