@@ -232,7 +232,7 @@ XML：Extensible Markup Language 可扩展标记语言；
 
   缺点：占内存；
 
-- **SAX ：逐行读取，基于事件驱动的（编码复杂）；**
+- **SAX ：逐行读取，基于事件驱动的；**
 
   优点：不占内存；
 
@@ -325,7 +325,340 @@ System.out.println(nameText);
 
 - #### selector:选择器
 
+使用的方法：Elements	select(String cssQuery); **注意css名称写法，可以参考Selector类中定义的语法**；
+
+- #### XPath：XPath即为XML路径语言，它是一种用来确定XML（标准通用标记语言的子集）文档中某部分位置的语言
+
+  1. 使用Jsoup的Xpath需要额外导入jar包。
+  2. 查询w3cshool参考手册，使用xpath的语法完成查询;
 
 
 
+### 3.6、补充点：
+
+- #### DOM 解析：
+
+```java
+import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+public class Demo1 {
+    public static void main(String[] args) throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.newDocument();
+
+        // 获取dom后，就可以依次进行增删查改CRUD
+       
+    }
+}
+```
+
+- #### SAX解析：
+
+```java
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class SaxDemo {
+    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+		// SAX一行行解析，必须借助SAXParserHandler来处理
+        SAXParserHandler handler = new SAXParserHandler();
+        sp.parse("stu.xml",handler); 
+    }
+}
+
+class SAXParserHandler extends DefaultHandler {
+    private String value = null;
+    private Student Student = null;
+    private ArrayList<Student> StudentList = new ArrayList<>();
+    public ArrayList<Student> getStudentList() {
+        return StudentList;
+    }
+
+    private int StudentIndex = 0;
+    /**
+     * 用来标识解析开始
+     */
+    @Override
+    public void startDocument() throws SAXException {
+        super.startDocument();
+        System.out.println("SAX解析开始");
+    }
+
+    /**
+     * 用来标识解析结束
+     */
+    @Override
+    public void endDocument() throws SAXException {
+        super.endDocument();
+        System.out.println("SAX解析结束");
+    }
+
+    /**
+     * 解析xml元素
+     */
+    @Override
+    public void startElement(String uri, String localName, String qName,
+                             Attributes attributes) throws SAXException {
+        //调用DefaultHandler类的startElement方法
+        super.startElement(uri, localName, qName, attributes);
+        if (qName.equals("Student")) {
+            StudentIndex++;
+            //创建一个Student对象
+            Student = new Student();
+            //开始解析Student元素的属性
+            System.out.println("======================开始遍历某一本书的内容=================");
+            //不知道Student元素下属性的名称以及个数，如何获取属性名以及属性值
+            int num = attributes.getLength();
+            for(int i = 0; i < num; i++){
+                System.out.print("Student元素的第" + (i + 1) +  "个属性名是："
+                        + attributes.getQName(i));
+                System.out.println("---属性值是：" + attributes.getValue(i));
+                if (attributes.getQName(i).equals("id")) {
+                    Student.setExamid(attributes.getValue(i));
+                }
+            }
+        }
+        else if (!qName.equals("name") && !qName.equals("Studentstore")) {
+            System.out.print("节点名是：" + qName + "---");
+        }
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName)
+            throws SAXException {
+        //调用DefaultHandler类的endElement方法
+        super.endElement(uri, localName, qName);
+        //判断是否针对一本书已经遍历结束
+        if (qName.equals("Student")) {
+            StudentList.add(Student);
+            Student = null;
+            System.out.println("======================结束遍历某一本书的内容=================");
+        }
+        else if (qName.equals("name")) {
+            Student.setName(value);
+        }
+        else if (qName.equals("examid")) {
+            Student.setExamid(value);
+        }
+        else if (qName.equals("location")) {
+            Student.setLocation(value);
+        }
+        else if (qName.equals("idcard")) {
+            Student.setIdcard(value);
+        }
+        
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
+        super.characters(ch, start, length);
+        value = new String(ch, start, length);
+        if (!value.trim().equals("")) {
+            System.out.println("节点值是：" + value);
+        }
+    }
+}
+```
+
+> ```java
+> 1、xml解析开始,startDocument被调用，这个方法在整个xml解析过程中调用了一次，所以我们可以在这个方法里面初为解析XML做一些准备，比如初始化变量 
+> 2、解析每遇到一个标签都会经历startElement-characters-endElement这个过程，即每一个标签都会触发startElement-characters-endElement 
+> 3、通过users这个根节点的解析，user标签解析以及name,password标签解析过程，我们知道user标签是users的子标签，name和password标签是user标签的子标签，我们知道当解析一个标签的时候，如果该标签有子标签，则先回调用该标签的startElement方法，这里面可以先得到该标签的属性信息，然后触发characters解析该标签的内容（值），然后子标签触发startElement-characters-endElement(子标签触发)，最后该标签触发endElement，该标签解析结束
+> ```
+
+- #### Dom4j解析：
+
+使用：
+
+1. 导入dom4j.jar； //  https://dom4j.github.io 下载最新的jar包；
+2. 由于dom4j本身不支持xpath，若要使用xpath格式，就必须再引入jaxen-1.1.6.jar包； // 各类jar包下载：https://mvnrepository.com/artifact/jaxen/jaxen/1.1.6
+
+```java
+public class Dom4jDemo {
+    public static String path;
+    /**
+    *  特别说明：此路径的文件，不是项目的src下的文件stu.xml，一定要去核对out的文件下的stu.xml;不要被眼前的src下的stu.xml迷惑了！！！！
+    */
+    static {
+        path = Dom4jDemo.class.getClassLoader().getResource("stu.xml").getPath();
+    }
+    
+    public static void main(String[] args){
+        Student s = new Student();
+        s.setExamid(1009+"");
+        s.setName("张飞");
+        s.setGrade(200);
+        s.setIdcard("123009889234");
+        s.setLocation("北京");
+        addUser(s);
+    }
+
+    // 增加学生
+    public static void addUser(Student student) {
+        try {
+            Document document = getDocument();
+            Element rootNode = document.getRootElement();
+
+            Element sNode = rootNode.addElement("student");
+            sNode.addAttribute("examid", student.getExamid());
+            sNode.addAttribute("idcard", student.getIdcard());
+
+            sNode.addElement("name").setText(student.getName());
+            sNode.addElement("location").setText(student.getLocation());
+            sNode.addElement("grade").setText(student.getGrade() + "");
+
+            write2Xml(document);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 查找学生
+    public static Student selectUser(String examid) throws DocumentException {
+        Document document = getDocument();
+
+        Element e = (Element) document.selectSingleNode("//student[@examid='"
+                + examid + "']");
+        if (e != null) {
+            Student s = new Student();
+            s.setExamid(e.attributeValue("examid"));
+            s.setIdcard(e.attributeValue("idcard"));
+
+            s.setName(e.element("name").getText());
+            s.setLocation(e.element("location").getText());
+            s.setGrade(Double.parseDouble(e.element("grade").getText()));
+
+            return s;
+        } else {
+            return null;
+        }
+
+        /*
+         * // List list=document.getRootElement().selectNodes("student"); List
+         * list=document.selectNodes("//student");//使用xpath Iterator
+         * it=list.iterator(); while(it.hasNext()) { Element e=(Element)
+         * it.next(); String value=e.attributeValue("examid");
+         * if(value.equals(examid)) { Student s = new Student();
+         * s.setExamid(e.attributeValue("examid"));
+         * s.setIdcard(e.attributeValue("idcard"));
+         *
+         * s.setName(e.element("name").getText());
+         * s.setLocation(e.element("location").getText());
+         * s.setGrade(Double.parseDouble(e.element("grade").getText()));
+         *
+         * return s; } }
+         *
+         * return null;
+         */
+    }
+
+	// 删除学生
+    public void deleteUser(String name) {
+        try {
+            Document document = getDocument();
+            List list = document.selectNodes("//name");
+            Iterator it = list.iterator();
+            // Element nameNode1=(Element) it.next();
+            // System.out.println(nameNode1.getText());
+            while (it.hasNext()) {
+                Element nameNode = (Element) it.next();
+                String value = nameNode.getText();
+                if (value.equals(name)) {
+                    // System.out.println(nameNode.getText());
+                    nameNode.getParent().getParent()
+                            .remove(nameNode.getParent());
+                    write2Xml(document);
+                    return;
+                }
+            }
+            throw new RuntimeException("删除失败");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // 获得操作xml的对象 获得document对象
+    public static Document getDocument() throws DocumentException {
+        SAXReader reader = new SAXReader();
+        /*
+         * 2.解析XML形式的文本,得到document对象.
+         *   String text ="<members></members>";
+         *   Document document =DocumentHelper.parseText(text);
+         *
+         *3.主动创建document对象.
+         *   Document document =DocumentHelper.createDocument();
+         *   //创建根节点 Element root =document.addElement("members");
+         */
+        return reader.read(new File(path));
+    }
+
+    // 将内存中的内容写入xml
+    public static void write2Xml(Document document) throws IOException {
+        //1.文档中全为英文,不设置编码,直接写入的形式
+        XMLWriter writer = new XMLWriter(new FileOutputStream(path));
+        writer.write(document);
+        writer.close();
+
+//      2.文档中含有中文,设置编码格式写入的形式
+//      OutputFormat format = OutputFormat.createPrettyPrint();// 指定XML编码
+//       format.setEncoding("utf-8");
+//       XMLWriter writer = new XMLWriter(new FileWriter(path),format);
+//       writer.write(document);
+//        writer.close();
+    }
+}
+
+public class Student {
+    private String examid;
+    private String idcard;
+    private String name;
+    private String location;
+    private double grade;
+    ....
+}    
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<exam>
+    <student examid="111" idcard="123">
+        <name>张三</name>
+        <location>广州</location>
+        <grade>100</grade>
+    </student>
+    <student examid="444" idcard="333">
+        <name>李四</name>
+        <location>大连</location>
+        <grade>97</grade>
+    </student>
+
+    <student examid="1111111" idcard="22222">
+        <name>小毛</name>
+        <location>广州</location>
+        <grade>23.0</grade>
+    </student>
+    <student examid="199" idcard="300">
+        <grade>80.0</grade>
+        <location>广州</location>
+        <name>钟源茂</name>
+    </student>
+</exam>
+```
 
