@@ -90,3 +90,13 @@ This inspection only reports if the project or module is configured to use a lan
 >       e.printStackTrace();
 > }
 > ```
+
+
+
+**issue-05:**
+
+```
+Intellij idea 出现错误 error:java: 无效的源发行版: 11解决方法!!
+```
+
+> Select the project, then File > ProjectStructure > ProjectSettings > Modules -> sources You probably have the Language Level set at 8: 根据当前jdk版本而定！！！
