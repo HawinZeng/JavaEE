@@ -116,6 +116,17 @@ HTTP：Hyper Text Transfer Protocol 超文本传输协议；
 
    封装POST请求消息的请求参数的。GET方式是没有请求体的！
 
+```properties
+Accept:text/html,application/xhtml+xm…plication/xml;q=0.9,*/*;q=0.8
+Accept-Encoding:gzip, deflate
+Accept-Language:zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Connection:keep-alive
+Host:localhost:8080
+Referer:http://localhost:8080/user_login/login.html
+Upgrade-Insecure-Requests:1
+User-Agent:Mozilla/5.0 (Macintosh; Intel …) Gecko/20100101 Firefox/63.0
+```
+
 ![](attach/F0_requestinfo.png)
 
 > **响应消息数据格式**：后续在详解！
@@ -295,11 +306,201 @@ HTTP：Hyper Text Transfer Protocol 超文本传输协议；
 
 ## 四、案例：用户登录
 
+```properties
+# src 下druid.proerties 
+driverClassName=com.mysql.jdbc.Driver
+url=jdbc:mysql:///day14
+username=root
+password=root
+initialSize=5
+maxActive=10
+maxWait=3000
+```
+
+```java
+public class JDBCUtils {
+
+    private static DataSource ds;
+
+    static {
+        try{
+            // 1.加载配置文件
+            Properties pro = new Properties();
+            String path = JDBCUtils.class.getClassLoader().getResource("druid.properties").getPath();
+            pro.load(new FileInputStream(path));
+
+            ds = DruidDataSourceFactory.createDataSource(pro);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public static DataSource getDataSource() {
+        return ds;
+    }
+
+    public static Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
+}
+```
+
+```java
+// 创建类UserDao,提供login方法
+/**
+ *   操作数据库中User表的类
+ */
+public class UserDao {
+	// 使用Spring中JdbcTemplate操控sql，必须引入spring相关jar
+    private JdbcTemplate template  = new JdbcTemplate(JDBCUtils.getDataSource());
+
+    /**
+     *  登录方法
+     *
+     * @param loginUser 只有username ，password
+     * @return User 包含数据库中所有信息
+     */
+    public User login(User loginUser){
+        /*
+        不处理，会如此报错，不友好！
+        org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: expected 1, actual 0
+         */
+        try{
+            String sql = "select * from user where name=? and password=?";
+            User user = template.queryForObject(sql, new BeanPropertyRowMapper<>(User.class),loginUser.getName(), loginUser.getPassword());
+            return user;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+public class User {
+    private int id;
+    private String name;
+    private String password;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+}
+```
+
+```java
+@WebServlet("/LoginServlet")
+public class LoginServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request,response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User loginUser = new User();
+//        loginUser.setName(request.getParameter("username"));
+//        loginUser.setPassword(request.getParameter("password"));
+        try {
+            BeanUtils.populate(loginUser,request.getParameterMap());
+            UserDao dao = new UserDao();
+            User user  = dao.login(loginUser);
+            if(user == null){
+                request.getRequestDispatcher("/failServlet").forward(request,response);
+            }else{
+                request.setAttribute("user",user);
+     		request.getRequestDispatcher("/successServlet").forward(request,response);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
 
 
 
+## 五、BeanUtils工具类，简化数据封装
+
+##### `org.apache.commons.beanutils.BeanUtils`：用于封装JavaBean的！
+
+#### 5.1、JavaBean：标准的Java类
+
+- 要求：
+  1. 类必须被public修饰；
+  2. 必须提供空参的构造器；
+  3. 成员变量必须使用private修饰；
+  4. 提供公共setter和getter方法；
+- 功能：封装数据
+
+> ```java
+> User user = template.queryForObject(sql, new BeanPropertyRowMapper<>(User.class),loginUser.getName(), loginUser.getPassword());
+> 
+> // 也请特别注意：BeanPropertyRowMapper封装数据，JavaBean的成员变量一定要与数据库的字段一一对应，否则取出来的数据，某些属性就是null；
+> ```
 
 
+
+#### 5.2、成员变量 & 属性：
+
+成员变量：类中、方法体外的变量，同时非静态变量；
+
+属性：setter和getter方法截取后的产物；例如：getUsername() --> Username--> username；
+
+大多情况成员变量与属性是一致的，但也有个别不同，参考下面：
+
+```java
+class User{
+    private String gender; // 成员变量 gender,属性 kGender
+    public String getKGender(){
+        return gender;
+    }
+    public void setKGender(String gender){
+        this.gender = gender;
+    }
+}
+```
+
+
+
+#### 5.3 、方法：
+
+```java
+1. setProperty()
+2. getProperty()
+// 重点，封装数据成JavaBean
+3. populate(Object obj , Map map):将map集合的键值对信息，封装到对应的JavaBean对象中
+```
 
 
 
