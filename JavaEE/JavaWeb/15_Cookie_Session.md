@@ -54,8 +54,9 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
 
   可以创建多个Cookie对象，使用response调用多次addCookie方法发送cookie即可。
 
-  ```
-  
+  ```java
+  response.addCookie("msg","name");
+  response.addCookie("age","age");
   ```
 
 - #### cookie在浏览器中保存多长时间？
@@ -415,7 +416,7 @@ void removeAttribute(String name)
 
 ## 五、案例：校验－验证码
 
-1. login.jsp
+1. **login.jsp**
 
 ```jsp
 <html>
@@ -466,7 +467,7 @@ void removeAttribute(String name)
 </html>
 ```
 
-2. LoginServlet
+2. **LoginServlet**
 
 ```java
 protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -504,7 +505,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
     }
 ```
 
-3. Success.jsp
+3. **Success.jsp**
 
 ```jsp
 <html>
