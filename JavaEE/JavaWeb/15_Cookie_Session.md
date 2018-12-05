@@ -124,9 +124,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
 
 ```java
 protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         resp.setContentType("text/html;charset=utf-8");
-
         boolean flag = false;
 
         Date date = new Date();
@@ -392,11 +390,11 @@ void removeAttribute(String name)
      1. 可以在Tomcat的Web.xml中，代表修改整个服务下的所有项目修改；
      2. 当然可以在对应项目，配置一个Web.xml来覆盖服务器的Web.xml;
 
-     ```	xml
-     <session-config>
-     	<session-timeout>30</session-timeout>
-     </session-config>
-     ```
+       ```	xml
+       <session-config>
+       	<session-timeout>30</session-timeout>
+       </session-config>
+       ```
 
 
 

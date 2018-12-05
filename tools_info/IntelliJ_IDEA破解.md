@@ -20,6 +20,9 @@ Mac OS 如何找到hosts：
 2. 终端：open /etc/hosts
 
 但是，hosts文件是没有权限修改的！需要修改etc文件的权限先，默认只有读，修改为读写权限；(需要管理员密码)
+
+Windows：
+C:\Windows\System32\drivers\etc\hosts
 ```
 
 ##### 第六步：在IntelliJ IDEA 注册码 网站，点击获取注册码；
