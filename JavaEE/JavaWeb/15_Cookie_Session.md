@@ -504,7 +504,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
     }
 ```
 
-3. success.jsp
+3. Success.jsp
 
 ```jsp
 <html>
