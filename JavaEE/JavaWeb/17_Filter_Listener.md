@@ -101,9 +101,9 @@
      #### - 拦截路径配置：
 
      1. 具体资源路径： /index.jsp   只有访问index.jsp资源时，过滤器才会被执行;
-     2. 拦截目录： /user/*	        访问/user下的所有资源时，过滤器都会被执行;
-     3. 后缀名拦截： *.jsp		访问所有后缀名为jsp资源时，过滤器都会被执行;
-     4. 拦截所有资源：/*		         访问所有资源时，过滤器都会被执行
+     	. 拦截目录： /user/*	        访问/user下的所有资源时，过滤器都会被执行;
+     	. 后缀名拦截： *.jsp		访问所有后缀名为jsp资源时，过滤器都会被执行;
+     	. 拦截所有资源：/*		         访问所有资源时，过滤器都会被执行
 
      #### - 拦截方式配置：资源被访问的方式
 
@@ -154,15 +154,41 @@
 
 ### 1.3.1、案例1——登录验证
 
-
+```java
+@WebFilter("/*")
+public class LoginFilter implements Filter {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException { 
+        //0.强制转换, 一般情况下都是Http请求，那么对应的rep也就是HttpServletRequest
+        HttpServletRequest request = (HttpServletRequest) req;
+        //1.获取资源请求路径
+        String uri = request.getRequestURI();
+        //2.判断是否包含登录相关资源路径,要注意排除掉 css/js/图片/验证码等资源
+        if(uri.contains("/login.jsp") || uri.contains("/loginServlet") || uri.contains("/css/") || uri.contains("/js/") || uri.contains("/fonts/") || uri.contains("/checkCodeServlet")  ){
+            //包含，用户就是想登录。放行
+            chain.doFilter(req, resp);
+        }else{
+            //不包含，需要验证用户是否登录
+            //3.从获取session中获取user
+            Object user = request.getSession().getAttribute("user");
+            if(user != null){
+                //登录了。放行
+                chain.doFilter(req, resp);
+            }else{
+                //没有登录。跳转登录页面
+                request.setAttribute("login_msg","您尚未登录，请登录");
+                request.getRequestDispatcher("/login.jsp").forward(request,resp);
+            }
+        }
+    }
+    ...
+ }   
+```
 
 
 
 - #### 请特别注意：
 
   1. 简单关闭浏览器，并不一定代表一次会话结束。如在Mac系统下，需要右击浏览器图标，点击退出才是一次会话结束！！
-
-
 
 
 
@@ -197,10 +223,128 @@
      2. 增强返回值类型；
      3. 增强方法体执行逻辑；
 
+```java
+public class ProxyTest {
+    public static void main(String[] args) {
+        //1.创建真实对象
+        Lenovo lenovo = new Lenovo();
+        
+        //2.动态代理增强lenovo对象
+        /*
+            三个参数：
+                1. 类加载器：真实对象.getClass().getClassLoader()
+                2. 接口数组：真实对象.getClass().getInterfaces()
+                3. 处理器：new InvocationHandler()
+         */
+        SaleComputer proxy_lenovo = (SaleComputer) Proxy.newProxyInstance(lenovo.getClass().getClassLoader(), lenovo.getClass().getInterfaces(), new InvocationHandler() {
+            /*
+                代理逻辑编写的方法：代理对象调用的所有方法都会触发该方法执行
+                    参数：
+                        1. proxy:代理对象
+                        2. method：代理对象调用的方法，被封装为的对象
+                        3. args:代理对象调用的方法时，传递的实际参数
+             */
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                //判断是否是sale方法
+                if(method.getName().equals("sale")){
+                    //1.增强参数
+                    double money = (double) args[0];
+                    money = money * 0.85;
+                    System.out.println("专车接你....");
+                    //使用真实对象调用该方法
+                    String obj = (String) method.invoke(lenovo, money);
+                    System.out.println("免费送货...");
+                    //2.增强返回值
+                    return obj+"_鼠标垫";
+                }else{
+                    Object obj = method.invoke(lenovo, args);
+                    return obj;
+                }
+            }
+        });
+
+        //3.调用方法
+       String computer = proxy_lenovo.sale(8000);
+        System.out.println(computer);
+    }
+}
+```
+
 
 
 ### 1.3.3、案例2——敏感词汇过滤
 
+```java
+@WebFilter("/*")
+public class SensetiveWordFilter implements Filter {
+    public void destroy() {
+    }
+
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
+        // 1. 真实对象
+        // 2. 代理对象
+        ServletRequest req_proxy = (ServletRequest) Proxy.newProxyInstance(req.getClass().getClassLoader(), req.getClass().getInterfaces(), new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                if(method.getName().equals("getParameter")){ // getParameter
+                    String result = (String) method.invoke(req, args[0]);
+                    if(result !=null){
+                        for(String str:list){
+                            result = result.replaceAll(str,"***");
+                        }
+                    }
+                    return result;
+                }
+                return method.invoke(req,args);
+            }
+        });
+        chain.doFilter(req_proxy, resp);
+    }
+
+    private List<String> list = new ArrayList<String>();
+
+    public void init(FilterConfig config) throws ServletException {
+        ServletContext servletContext = config.getServletContext();
+        String realPath = servletContext.getRealPath("/WEB-INF/classes/敏感词汇.txt");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(realPath))){
+            String line;
+            while((line = br.readLine())!=null){
+                list.add(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+> 注意：
+>
+> ```java
+> String realPath = servletContext.getRealPath("/WEB-INF/classes/敏感词汇.txt"); 
+> 
+> // 等同于
+> 
+> String realPath = SensetiveWordFilter.class.getClassLoader().getResource("敏感词汇.txt").getPath();
+> ```
+
+
+
+## 二、Listener：监听器
+
+2.1、概念：web的三大组件之一；
+
+- 事件监听机制：
+  - 事件：一件事情；
+  - 事件源：事件发生的地方；
+  - 监听器：一个对象；
+  - 注册监听：将事件、事件源、监听器绑定在一起。 当事件源上发生某个事件后，执行监听器代码
+
+
+
+### 2.2、ServletContextListener:监听ServletContext对象的创建和销毁
 
 
 
@@ -216,16 +360,20 @@
 
 
 
+## 三、练习：
+
+【代码题】
+
+在网站中有一些数据是长时间不会发生变化的,比如图片,css文件,js文件.
+
+因此,有一个需求是网页中的图片,css文件,js文件需要进行缓存.
+
+请写一个过滤器实现以上需求,要求图片缓存1分钟,css文件缓存10分钟,js文件缓存20分钟
 
 
 
+【代码题】
 
+在网站中页面中的内容是经常发生变化的,因此需要设计一个过滤器,使
 
-
-
-
-
-
-
-
-
+访问的jsp页面不进行缓存；

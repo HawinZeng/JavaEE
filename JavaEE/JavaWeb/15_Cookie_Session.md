@@ -191,15 +191,15 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
 
 2. index.jsp访问，查看对应服务器运行的work目录，可以查看到对应index.java文件如下：
 
-> work目录:
+> **work目录:**
 >
-> Mac:
+> **Mac:**
 >
-> CATALINA_BASE:  /Users/iMac/Library/Caches/IntelliJIdea2018.2/tomcat/Tomcat_8_5_35_servlet_5
+> **CATALINA_BASE:  /Users/iMac/Library/Caches/IntelliJIdea2018.2/tomcat/Tomcat_8_5_35_servlet_5**
 >
-> Windows:
+> **Windows:**
 >
->
+>**CATALINA_BASE:  C:\Users\Hawin\\.IntelliJIdea2017.3\system\tomcat\\_web**
 
 ```jsp
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
