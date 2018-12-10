@@ -1,4 +1,4 @@
-# 第十七节  JSP MVC EL JSTL
+# 第十六节  JSP MVC EL JSTL
 
 ## 一、JSP
 
