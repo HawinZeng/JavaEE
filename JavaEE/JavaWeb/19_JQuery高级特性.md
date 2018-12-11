@@ -92,6 +92,12 @@ for(var i=0;i<condition; 步长)
 
 * **格式：`jq对象.事件方法(回调函数)；`**
 
+  ```javascript
+  $("#username").blur(function () { // 失去焦点事件触发
+      var username = $(this).val();
+   }
+  ```
+
 * 注：如果调用事件方法，不传递回调函数，则会触发浏览器默认行为。
 
   - 获取焦点：`$(#name).focus()`

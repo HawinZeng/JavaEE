@@ -2,7 +2,7 @@ ctrl+x 删除行
 
 ctrl＋p 提示参数信息
 
-
+ctrl+shift+up/down : 代码块上下移动
 
 ## Ctrl
 
