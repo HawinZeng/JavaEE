@@ -450,6 +450,74 @@
 
 
 
+## 七、案例
+
+##### 案例需求：
+
+1. ##### 提供index.html页面，页面中有一个省份 下拉列表
+
+2. ##### 当 页面加载完成后 发送ajax请求，加载所有省份;
+
+3. ##### 使用redis缓存一些不经常发生变化的数据。
+
+4. ##### 据库的数据一旦发生改变，则需要更新缓存。
+
+   数据库的表执行 增删改的相关操作，需要将redis缓存数据情况，再次存入;
+
+```java
+    public String findAllProvinceByCache() {
+        // 1. 获取redis客户端
+        try(Jedis jedis = JedisPoolUtils.getJedis();){
+            // 2. 取值province_json
+            String province_json = jedis.get("province");
+            // 3. 若没有就查询数据库
+            if(province_json ==null || "".equals(province_json)){
+                System.out.println("没有缓存，查询数据库！！！");
+                List<Province> provinces = findAllProvince();
+                ObjectMapper mapper = new ObjectMapper();
+                province_json = mapper.writeValueAsString(provinces);
+                jedis.set("province",province_json);
+            }else{
+                System.out.println("取缓存数据了！！！！");
+            }
+            // 4. 返回数据
+            return province_json;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+```
+
+```jsp
+<html>
+  <head>
+    <title>省份选择</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script>
+      $(function () {
+          $.get("findProvinceServlet",function (data) {
+              // data : [{id:1,"name":"北京"},{id:1,"name":"北京"}]
+              var province = $("#province_select");
+              $(data).each(function () {
+                  province.append("<option name='"+this.id+"'>"+this.name+"</option>");
+              });
+          });
+      });
+
+    </script>
+  </head>
+  <body>
+    <select id="province_select">
+      <option>--请选择省份--</option>
+    </select>
+  </body>
+</html>
+```
+
+
+
+
 
 
 
