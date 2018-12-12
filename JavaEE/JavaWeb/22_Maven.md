@@ -285,59 +285,113 @@ maven 对项目构建过程分为三套相互独立的生命周期,请注意这�
 > 如图 Settings中 Maven>Runner>VM Options 加上 -DarchetypeCatalog=internal
 > ```
 
-- ##### 新建项目：如一个JAVA工程
 
-  1. loading Template后，勾选`create from archetype`
-  2. 选择`org.apache.maven.archetype:maven-archetype-quickstart`骨架
-  3. 填写好项目信息三项资料：
-     - GroupId: 公司或组织的名称     com_enooy
-     - ArtifactId: 项目名称  maven_java
-     - Version: 项目版本号  1.0-SNAPHOT (初次新建可不改)
-  4. 填写好项目路径信息：
-     - project name: maven_java
-     - project location:  /Volumes/D/maven/maven_java
 
-  > **初次加载会下载对应相关依赖或插件，比较慢！设置了使用本地maven骨架及插件，再次加载时会比较快！**
+### 6.2、新建项目：
+
+#### 6.2.1、使用maven骨架archetype，新建一个java项目
+
+1. loading Template后，勾选`create from archetype`
+2. 选择`org.apache.maven.archetype:maven-archetype-quickstart`骨架
+3. 填写好项目信息三项资料：
+   - GroupId: 公司或组织的名称     com_enooy
+   - ArtifactId: 项目名称  maven_java
+   - Version: 项目版本号  1.0-SNAPHOT (初次新建可不改)
+4. 填写好项目路径信息：
+   - project name: maven_java
+   - project location:  /Volumes/D/maven/maven_java
+
+> **初次加载会下载对应相关依赖或插件，比较慢！设置了使用本地maven骨架及插件，再次加载时会比较快！**
 
 - ##### maven默认情况不会将所有maven该有的工程文件都创建，需要手动添加
 
   如maven_java项目，却少resources资源文件。new directory 命名为resources，默认情况，IDEA不会当成资源文件夹，需要标记为资源文件夹。右键该文件 --> **`Mark Directory as  -- Sources Root`**
 
+```java
+//1.  首次，发现本地骨架没有定义，需要download
+[INFO] Archetype repository not defined. Using the one from [org.apache.maven.archetypes:maven-archetype-quickstart:1.1] found in catalog internal
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/maven-metadata.xml
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/maven-metadata.xml (560 B at 57 B/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/1.3/maven-archetype-quickstart-1.3.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/1.3/maven-archetype-quickstart-1.3.pom (1.6 kB at 420 B/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/1.3/maven-archetype-quickstart-1.3.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/archetypes/maven-archetype-quickstart/1.3/maven-archetype-quickstart-1.3.jar (7.0 kB at 1.3 kB/s)
+
+// 2. download骨架后，build success，但是此时还没有成功，需要download 相关插件plugins，才能支撑项目运行；
+```
+
+### 6.2.2、不使用骨架创建java项目
+
+- ##### 不勾选create archetype，直接创建即可！其余步骤一致；
+
+- ##### 特点：
+
+  - 能很快创建项目，不需要去下载骨架相关依赖及插件；
+  - 而且，在项目会生成resources资源包，与标准项目目录更接近，故推荐使用此方式搭建工程；
+
+### 6.2.3、创建web项目
+
+1. 选择：`org.apache.maven.archetype:maven-archetype-webapp`创建
+2. 创建后，只有webapp文件夹，其他文件都需要手动添加；
 
 
 
+## 七、案例
+
+#### 7.1、如何将java 文件夹（普通文件）转化为webapp相关文件夹
 
 
 
+### 7.2、创建Servlet
 
+- 首次new servlet根本就没有那个选项，如何解决？
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  > **找到maven_web.iml文件，添加下面标签内容，然后重启项目即可**
+  >
+  > ```xml
+  > <!-- 在sourceRoots添加第1条即可，若第2条没有，也加上 -->
+  > <sourceRoots>
+  >     <root url="file://$MODULE_DIR$/src/main/java" />
+  >     <root url="file://$MODULE_DIR$/src/main/resources" />
+  > </sourceRoots>
+  > ```
 
 ```
-[WARNING] Add a repsoitory with id 'archetype' in your settings.xml if archetype's repository is elsewhere.
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-archetype-quickstart/1.3.2/wicket-archetype-quickstart-1.3.2.pom
-Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-archetype-quickstart/1.3.2/wicket-archetype-quickstart-1.3.2.pom (601 B at 157 B/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-jdk14/1.3.2/wicket-jdk14-1.3.2.pom
-Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-jdk14/1.3.2/wicket-jdk14-1.3.2.pom (3.0 kB at 4.4 kB/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-parent/1.3.2/wicket-parent-1.3.2.pom
-Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-parent/1.3.2/wicket-parent-1.3.2.pom (20 kB at 11 kB/s)
-Downloading from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-archetype-quickstart/1.3.2/wicket-archetype-quickstart-1.3.2.jar
-Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/wicket/wicket-archetype-quickstart/1.3.2/wicket-archetype-quickstart-1.3.2.jar (13 kB at 9.2 kB/s)
+<!-- 项目运行依赖的jar -->
+<!--<dependencies>-->
+  <!--<dependency>-->
+    <!--<groupId>javax.servlet</groupId>-->
+    <!--<artifactId>servlet-api</artifactId>-->
+    <!--<version>2.5</version>-->
+  <!--</dependency>-->
+  <!--<dependency>-->
+    <!--<groupId>javax.servlet.jsp</groupId>-->
+    <!--<artifactId>jsp-api</artifactId>-->
+    <!--<version>2.0</version>-->
+  <!--</dependency>-->
+  <!--<dependency>-->
+    <!--<groupId>junit</groupId>-->
+    <!--<artifactId>junit</artifactId>-->
+    <!--<version>4.12</version>-->
+  <!--</dependency>-->
+<!--</dependencies>-->
 ```
+
+> ```javascript
+> <project xmlns="http://maven.apache.org/POM/4.0.0" ...
+> 
+> 头部提示错误 Duplicated tag: 'dependencies'  (position: START_TAG seen ...</properties>\r\n\r\n <dependencies>... @30:17) less... 
+>     
+> 原因：重复的<dependencies></dependencies>标签！！
+> ```
+
+
+
+
+
+
+
+
 
 
 
