@@ -222,16 +222,20 @@ HawiniMac:maven-helloworld F3234883$ mvn compile
 HawiniMac:maven-helloworld F3234883$ mvn clean
 ```
 
-### 4.3、test
+### 4.3、test 
+
+##### maven 工程的测试命令
 
 ```
-
+HawiniMac:maven-helloworld F3234883$ mvn test
 ```
 
 ### 4.4、package
 
-```
+##### maven 工程的打包命令,对于 java 工程执行 package 打成 jar 包,对于 web 工程打成 war包。
 
+```
+HawiniMac:maven-helloworld F3234883$ mvn package
 ```
 
 ### 4.5、install
@@ -262,11 +266,7 @@ maven 对项目构建过程分为三套相互独立的生命周期,请注意这�
 
 ## 五、Maven的概念模型
 
-
-
-
-
-
+![](attach/F0_maven概念模型图.png)
 
 ## 六、IDEA开发maven项目
 
@@ -340,13 +340,23 @@ Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/a
 
 #### 7.1、如何将java 文件夹（普通文件）转化为webapp相关文件夹
 
+步骤：
+
+1. ##### File－－》Project Structure －－》Modules 即可发现当前的项目模块；
+
+2. ##### 展开maven_web项目文件夹，里面有一个web。查看右侧Web Resource Directories只有 src/main/webapp, 即当前只有此文件夹是对应的web resource文件夹。
+
+3. ##### 若要新增，点击下方'＋'新增即可。移除点击'－'即可；
+
+![](attach/F0_maven_web.png)
+
 
 
 ### 7.2、创建Servlet
 
-- 首次new servlet根本就没有那个选项，如何解决？
+- ##### 首次new servlet根本就没有那个选项，如何解决？
 
-  > **找到maven_web.iml文件，添加下面标签内容，然后重启项目即可**
+  > **方案1.  找到maven_web.iml文件，添加下面标签内容，然后重启项目即可**
   >
   > ```xml
   > <!-- 在sourceRoots添加第1条即可，若第2条没有，也加上 -->
@@ -355,49 +365,245 @@ Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/a
   >     <root url="file://$MODULE_DIR$/src/main/resources" />
   > </sourceRoots>
   > ```
+  >
+  > **方案2. 先把servlet依赖加进来，就自动有servlet选项了**
+
+- ##### 创建Servlet后，发现无法导包，why？ 这是由于maven将jar包与项目隔离了，所以此时我们要添加项目对应的jar包； 在pom.xml添加相关依赖如下：
+
+  ```xml
+  <!-- 项目运行依赖的jar -->
+  <dependencies>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.5</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+        <scope>test</scope>
+      </dependency>
+  </dependencies>
+  ```
+
+  > ```java
+  > 若头部提示错误 Duplicated tag: 'dependencies'  (position: START_TAG seen ...</properties>\r\n\r\n <dependencies>... @30:17) less... 
+  >     
+  > 原因：重复的<dependencies></dependencies>标签！！检查是否重复了即可！
+  > ```
+
+- ##### 若本地没有相关jar包，可以到maven的中央仓库去搜索
+
+  `http://search.maven.org/ `
+
+  `http://mvnrepository.com/ `
+
+- ##### 如何在Intellij IDEA运行maven项目？
+
+  ```
+  步骤：
+  1. 点击IDEA工具右侧的Maven Projects bar；
+  2. 可以查看到：Lifecycle(生命周期命令)；Plugins(生命周期对应的插件);Dependencies(项目依赖的jar)
+  3. 双击各条命令，即可执行。但是，却没有项目运行的tomcat:run命令；
+  4. 点击上侧工具bar的m图标键(Execute Maven Goal)，可以收到输入目标命令执行；
+  ```
+
+- ##### 运行项目，访问却出错！！
+
+  ```java
+  java.lang.ClassCastException: com.enooy.web.servlet.ServletDemo1 cannot be cast to javax.servlet.Servlet
+  ```
+
+  问题：
+
+  1. ##### Maven 管理项目，将jar与项目隔离了。所以我们需要依赖导入jar，避免编译运行异常！
+
+  2. ##### 当执行tomcat:run命令后，项目正式运行了。此时项目会有两套servlet.jar，jsp.jar。为啥，因为tomcat本身就有一套，而后面又依赖引入一套。造成jar混乱，从而出现ClassCastException异常；
+
+  3. 怎么解决？我们导包一个重要原因是让编译通过，那么我们添加依赖时，明确依赖的作用范围即可，不让依赖包同项目一并部署！具体解决添加`<scope></scope>`
+
+     ```xml
+     <dependencies>
+         <dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>servlet-api</artifactId>
+           <version>2.5</version>
+           <scope>provided</scope>
+         </dependency>
+         <dependency>
+           <groupId>javax.servlet.jsp</groupId>
+           <artifactId>jsp-api</artifactId>
+           <version>2.0</version>
+           <scope>provided</scope>
+         </dependency>
+         <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <version>4.11</version>
+           <scope>test</scope>
+         </dependency>
+       </dependencies>
+     ```
+
+     ##### 范围值说明：
+
+     - **compile：**编译范围,指 A 在编译时依赖 B,此范围为默认依赖范围。编译范围的依赖会用在编译、测试、运行,由于运行时需要所以编译范围的依赖会被打包。
+     - **provided：**只有在当JDK或者一个容器已提供该依赖之后才使用, provided依赖在编译和测试时需要,在运行时不需要,比如:servlet api 被 tomcat 容器提供。
+     - **runtime：**在运行和测试系统的时候需要,但在编译的时候不需要。比如:jdbc的驱动包。由于运行时需要所以 runtime 范围的依赖会被打包。
+     - **test：**在编译和运行时都不需要,它们只有在测试编译和测试运行阶段可用,比如:junit。由于运行时不需要所以 test 范围依赖不会被打包。
+     - **system：**与 provided 类似,但是你必须显式的提供一个对于本地系统中 JAR文件的路径,需要指定 systemPath 磁盘路径,system 依赖不推荐使用；
+
+     #####  maven-web 工程中测试各个scope测试总结:
+
+     1.  默认引入 的 jar 包 ------- compile 【默认范围 可以不写】(编译、测试、运行 都有效 )
+     2.  servlet-api 、jsp-api ------- provided (编译、测试 有效, 运行时无效 防止和 tomcat 下 jar 冲突)
+     3.  jdbc 驱动 jar 包 ---- runtime (测试、运行 有效 )
+     4.  junit ----- test (测试有效)
+     5. 依赖范围由强到弱的顺序是:compile>provided>runtime>test
+
+     | 依赖范围     | 编译classpath有效 | 测试classpath有效 | 运行classpath有效 | 例子                      |
+     | ------------ | :---------------: | :---------------: | :---------------: | :------------------------ |
+     | **compile**  |         Y         |         Y         |         Y         | spring-core               |
+     | **test**     |         -         |         Y         |         -         | Junit                     |
+     | **provided** |         Y         |         Y         |         -         | servlet-api               |
+     | **runtime**  |         -         |         Y         |         Y         | JDBC-driver               |
+     | **system**   |         Y         |         Y         |         -         | local Maven仓库之外的类库 |
+
+
+## 八、修改Maven运行环境
+
+#### 8.1、maven 默认是Tomcat 6，那如何我们让项目在Tomcat 7运行呢？
+
+答案：配置tomcat7 插件即可！在pom.xml添加如下
+
+```xml
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <port>8888</port>
+          <path>/</path>
+        </configuration>
+      </plugin>
+    </plugin
+```
+
+##### 执行时：输入 tomcat7:run即可！
+
+#### 8.2、如何添加配置插件模版
 
 ```
-<!-- 项目运行依赖的jar -->
-<!--<dependencies>-->
-  <!--<dependency>-->
-    <!--<groupId>javax.servlet</groupId>-->
-    <!--<artifactId>servlet-api</artifactId>-->
-    <!--<version>2.5</version>-->
-  <!--</dependency>-->
-  <!--<dependency>-->
-    <!--<groupId>javax.servlet.jsp</groupId>-->
-    <!--<artifactId>jsp-api</artifactId>-->
-    <!--<version>2.0</version>-->
-  <!--</dependency>-->
-  <!--<dependency>-->
-    <!--<groupId>junit</groupId>-->
-    <!--<artifactId>junit</artifactId>-->
-    <!--<version>4.12</version>-->
-  <!--</dependency>-->
-<!--</dependencies>-->
+1. Mac: Intellij IDEA preference -> 搜索Live Templates -> 即可添加
+2. windows： File -> Settings -> 搜索Live Templates -> 即可添加
 ```
 
-> ```javascript
-> <project xmlns="http://maven.apache.org/POM/4.0.0" ...
-> 
-> 头部提示错误 Duplicated tag: 'dependencies'  (position: START_TAG seen ...</properties>\r\n\r\n <dependencies>... @30:17) less... 
->     
-> 原因：重复的<dependencies></dependencies>标签！！
-> ```
+![](attach/F0_maven_denpendeces.png)
+
+#### 8.3、JDK版本插件配置
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <!-- 编译时JDK版本 -->
+        <target>1.8</target>
+        <!-- classes文件JDK版本 -->
+        <source>1.8</source>
+        <!-- 编码格式 -->
+        <encoding>UTF-8</encoding>
+    </configuration>
+</plugin>
+```
 
 
 
+## 九、操作MySql
 
+```java
+public class ProvinceDaoImpl implements ProvinceDao {
 
+    public List<Province> findAll() {
+        List<Province> list = new ArrayList<Province>();
+        Connection connection = null;
+        PreparedStatement pstat = null;
+        ResultSet rs = null;
+        try {
+            // 1. 加载驱动
+            Class.forName("com.mysql.jdbc.Driver");
+            // 2. 获取数据库链接
+//            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/db23", "root", "root");
+            connection = DriverManager.getConnection("jdbc:mysql:///day23","root","root");
+            // 3. 定义sql
+            String sql = "select * from province";
+            // 4. 创建数据库sql执行对象
+            pstat = connection.prepareStatement(sql);
+            // 4.1 传递参数进去，若没有可以不写
 
+            // 5. 执行
+            rs = pstat.executeQuery();
+            // 6. 处理结果
+            while(rs.next()){
+                Province province = new Province();
+                province.setId(rs.getInt(1)); // 特别注意：是从第1排开始，没有第0排概念
+                province.setName(rs.getString(2));
+                // province.setId(rs.getInt("id")); // 同上面的效果
+                // province.setName(rs.getString("name"));
+                list.add(province);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // 7. 关闭资源
+            if (null != rs){
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (null != pstat){
+                try {
+                    pstat.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (null != connection){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return list;
+    }
+}
+```
 
-
-
-
-
-
-
-
+```xml
+		// 添加JDBC驱动依赖
+		<dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
+            <scope>runtime</scope>
+        </dependency>
+```
 
 
 
