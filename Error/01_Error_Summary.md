@@ -100,3 +100,52 @@ Intellij idea 出现错误 error:java: 无效的源发行版: 11解决方法!!
 ```
 
 > Select the project, then File > ProjectStructure > ProjectSettings > Modules -> sources You probably have the Language Level set at 8: 根据当前jdk版本而定！！！
+
+
+
+##### issue-06:
+
+```java
+Caused by: java.lang.IllegalStateException: ContainerBase.addChild: start: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/day16]]
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:758)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:730)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:734)
+	at org.apache.catalina.startup.HostConfig.manageApp(HostConfig.java:1736)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.apache.tomcat.util.modeler.BaseModelMBean.invoke(BaseModelMBean.java:300)
+	... 31 more
+	
+	Artifact day16_cookie:war exploded: Error during artifact deployment.
+        
+Caused by: java.lang.IllegalArgumentException: The servlets named [cn.itcast.cookie.CookieDemo4] and [com.lolo.example.CookieDemo4] are both mapped to the url-pattern [/cookieDemo4] which is not permitted.
+```
+
+>由于影射了相同的路径，造成项目部署失败！
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -51,9 +51,9 @@
 - 代码
 
    //1.创建数据库连接池对象
-  DataSource ds  = new ComboPooledDataSource();
-  //2. 获取连接对象
-  Connection conn = ds.getConnection();
+    DataSource ds  = new ComboPooledDataSource();
+    //2. 获取连接对象
+    Connection conn = ds.getConnection();
 
 
 
@@ -164,6 +164,15 @@ public final class JDBCUtils {
     }
 }
 ```
+
+## 特别注意：统一编码格式防止意外
+
+```java
+// 一定要加   ?useUnicode=true&characterEncoding=UTF-8  这一串！！！！
+url=jdbc:mysql:///day14?useUnicode=true&characterEncoding=UTF-8
+```
+
+
 
 
 

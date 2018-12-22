@@ -114,6 +114,11 @@
   * redis-cli.exe：redis的客户端
   * redis-server.exe：redis服务器端
 
+```
+开启： 先开redis-server 再开redis-cli；
+关闭：redis-cli 直接输入shutdown即可！
+```
+
 
 
 ## 三、使用

@@ -4,6 +4,10 @@ ctrl＋p 提示参数信息
 
 ctrl+shift+up/down : 代码块上下移动
 
+ctrl ＋ R：编辑界面执行局部替换；
+
+ctrl+alt+T：快速导入try .. catch , if..else系列
+
 ## Ctrl
 
 | 快捷键           | 介绍                                                         |
