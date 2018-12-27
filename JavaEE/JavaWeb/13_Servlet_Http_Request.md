@@ -117,17 +117,40 @@ HTTP：Hyper Text Transfer Protocol 超文本传输协议；
    封装POST请求消息的请求参数的。GET方式是没有请求体的！
 
 ```properties
-Accept:text/html,application/xhtml+xm…plication/xml;q=0.9,*/*;q=0.8
-Accept-Encoding:gzip, deflate
-Accept-Language:zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
-Connection:keep-alive
-Host:localhost:8080
-Referer:http://localhost:8080/user_login/login.html
-Upgrade-Insecure-Requests:1
-User-Agent:Mozilla/5.0 (Macintosh; Intel …) Gecko/20100101 Firefox/63.0
+# 请求行信息
+POST /bookstore/user/login HTTP/1.1
+# 请求头信息
+Host: localhost:8080
+Connection: keep-alive
+Content-Length: 26
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Origin: http://localhost:8080
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Referer: http://localhost:8080/bookstore/login.jsp
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cookie: JSESSIONID=C8CE19E39601B949F083C5DEBAEB7F11; Idea-bec27515=d6193362-5216-450a-8172-5cb6d8aa84cc
+
+# 请求体 (From Data-->POST请求)
+username=sweg&password=wet
 ```
 
-![](attach/F0_requestinfo.png)
+```properties
+# 请求行信息
+GET /bookstore/book/queryByPage?currentPage=2 HTTP/1.1
+# 请求头信息
+Host: localhost:8080
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Referer: http://localhost:8080/bookstore/product_list.jsp
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cookie: JSESSIONID=C8CE19E39601B949F083C5DEBAEB7F11; Idea-bec27515=d6193362-5216-450a-8172-5cb6d8aa84cc
+```
 
 > **响应消息数据格式**：后续在详解！
 

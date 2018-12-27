@@ -40,5 +40,20 @@
 
 
 
-三、
+## 三、登录/注册
+
+```java
+Servlet.service() for servlet [jsp] in context with path [/bookstore] threw exception [Unable to compile class for JSP: 
+
+查找原因：由于Maven的依赖jsp 与 Tomcat本省jsp 两套api冲突造成无法compile class！！！
+解决： Maven的依赖jsp添加作用域：<scope>provided</scope>
+```
+
+
+
+
+
+
+
+
 

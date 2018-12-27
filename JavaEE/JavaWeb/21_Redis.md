@@ -285,6 +285,8 @@
   ```java
   127.0.0.1:6379> zrem mysort lisi
   (integer) 1
+      
+  127.0.0.1:6379>  zremrangebyscore pageBean 1 3 (根据score 范围，删除多个数据)
   
   127.0.0.1:6379> zrange mysort 0 -1
   1) "zhangsan"
