@@ -127,6 +127,17 @@ Caused by: java.lang.IllegalArgumentException: The servlets named [cn.itcast.coo
 
 
 
+##### issue-07:
+
+```java
+// 运行maven项目是发现如下警告
+Warning:java: 源值1.5已过时, 将在未来所有发行版中删除
+```
+
+> ##### 修改module的jdk版本，maven默认是jdk1.5。File/Project_stucture/Modules目录
+>
+> ![](attach/e_001.png)
+
 
 
 

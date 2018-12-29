@@ -258,10 +258,11 @@ public static void main(String[] args) throws IOException {
     InputStream in = Resources.getResourceAsStream("SqlMapConfig.xml");
     // 2. 创建SqlSessionFactory工厂
     SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+    // 2.1 创建工厂 --> 构建者模式 (把对象的创建细节隐藏，使用者直接调用方法即可拿到对象)
     SqlSessionFactory factory = builder.build(in);
-    // 3. 使用工厂生产SqlSession对象
+    // 3. 使用工厂生产SqlSession对象 --> 工厂模式：达到解耦，降低类之间的依赖关系；
     SqlSession session = factory.openSession();
-    // 4. 使用SqlSession创建DAO接口的代理对象
+    // 4. 使用SqlSession创建DAO接口的代理对象 --> 代理模式：不修改源码的基础上对已有方法增强；
     IUserDao userDao = session.getMapper(IUserDao.class);
     // 5. 使用代理对象执行方法
     List<User> users = userDao.findAll();
@@ -349,9 +350,257 @@ public static void main(String[] args) throws IOException {
 
 
 
+### 2.6、自定义Mybatis的分析：
+
+mybatis在使用代理dao的方式实现增删改查时做什么事呢？
+
+只有两件事：
+
+- 第一：创建代理对象；
+- 第二：在代理对象中调用selectList；
+
+#### 自定义Mybatis代码如下：
+
+##### 1. 首先参考原有调用，需要创建如下类及接口：
+
+- ##### class Resources
+
+- ##### class SqlSessionFactoryBuilder
+
+- ##### interface SqlSessionFactory  --> class DefaultSqlSessionFactory
+
+- ##### interface SqlSession --> class DefaultSqlSession
+
+```java
+public static void main(String[] args) throws IOException {
+    // 1. 读取配置文件
+    InputStream in = Resources.getResourceAsStream("SqlMapConfig.xml");
+    // 2. 创建SqlSessionFactory工厂
+    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+    SqlSessionFactory factory = builder.build(in);
+    // 3. 使用工厂生产SqlSession对象
+    SqlSession session = factory.openSession();
+    // 4. 使用SqlSession创建DAO接口的代理对象
+    IUserDao userDao = session.getMapper(IUserDao.class);
+    // 5. 使用代理对象执行方法
+    List<User> users = userDao.findAll();
+    for(User user:users){
+        System.out.println(user);
+    }
+    // 6. 释放资源
+    session.close();
+    in.close();
+}
+```
+
+##### 2. Resources
+
+```java
+/**
+ * 配置文件读取, 读取主配置文件SqlMapConfig.xml，转化成流
+ */
+public class Resources {
+
+    public static InputStream getResourceAsStream(String filePath){
+        /*
+              读取配置，路径确认只有两种：
+              1. java 项目： Resources.class.getClassLoader() 即可找到src下的filepath，maven管理的项目，即resources下的filepath
+              2. java_web 项目： Servlet.getServletContext().getRealPath(filePath); 获取真实路径
+         */
+        return Resources.class.getClassLoader().getResourceAsStream(filePath);
+
+    }
+}
+```
+
+##### 3. SqlSessionFactoryBuilder
+
+```java
+/**
+ * 构建类：构建SqlSessionFactor对象
+ */
+public class SqlSessionFactoryBuilder {
+    public SqlSessionFactory build(InputStream in){
+        // 将主配置文件转化为Configuration对象，dom4j解析xml
+        Configuration cfg = XMLConfigBuilder.loadConfiguration(in);
+        return new DefaultSqlSessionFactory(cfg);
+    }
+}
+```
+
+```java
+public class Configuration {
+    // 数据库驱动信息
+    private String driver;
+    private String url;
+    private String username;
+    private String password;
+	
+    // 对应<mapper>中的com/eoony/dao/IUserDao.xml封装对象集合
+    private Map<String,Mapper> mappers = new HashMap<String, Mapper>();
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
 
+    public Map<String, Mapper> getMappers() {
+        return mappers;
+    }
 
+    public void setMappers(Map<String, Mapper> mappers) {
+        this.mappers.putAll(mappers);
+    }
+}
+```
+
+```xml
+<!--   主配置文件SqlMapConfig.xml   -->
+<configuration>
+    <environments default="mysql">
+        <!--配置mysql的环境-->
+        <environment id="mysql">
+            <!--配置事务的类型-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!--配置数据源（连接池）-->
+            <dataSource type="POOLED">
+                 <property name="driver" value="com.mysql.jdbc.Driver"/>
+                 <property name="url" value="jdbc:mysql://localhost:3306/mybatis"/>
+                 <property name="username" value="root"/>
+                 <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--
+        指定映射配置文件的位置，映射配置文件的是每个dao独立的配置文件
+    -->
+    <mappers>
+        <mapper resource="com/eoony/dao/IUserDao.xml"/>
+        <!--<mapper class="com.eoony.dao.IUserDao"/>-->
+    </mappers>
+</configuration>
+```
+
+##### 4. interface SqlSessionFactory  --> class DefaultSqlSessionFactory
+
+```java
+public interface SqlSessionFactory {
+    // 获取SqlSession对象
+    SqlSession openSession();
+}
+
+// 实现类
+public class DefaultSqlSessionFactory implements SqlSessionFactory {
+    private Configuration cfg;
+    public DefaultSqlSessionFactory(Configuration cfg){
+        this.cfg = cfg;
+    }
+
+    public SqlSession openSession() {
+        return new DefaultSqlSession(cfg);
+    }
+}
+```
+
+##### 5. interface SqlSession --> class DefaultSqlSession
+
+```java
+public interface SqlSession {
+    public <T> T getMapper(Class<T> cls);
+    public void close();
+}
+
+// 实现类
+public class DefaultSqlSession implements SqlSession {
+    private Map<String,Mapper> mappers;
+    private Connection conn;
+
+    public DefaultSqlSession(Configuration cfg){
+        mappers = cfg.getMappers();
+        conn = DataSourceUtils.getConnection(
+            cfg.getDriver(),cfg.getUrl(),cfg.getUsername(),cfg.getPassword());
+    }
+
+    /**
+     * 创建dao的代理对象
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getMapper(Class<T> mapperClass) {
+        return (T) Proxy.newProxyInstance(mapperClass.getClassLoader(), new Class[]{mapperClass}, new DefaultMapperProxy(mappers,conn));
+    }
+
+    public void close() {
+        if(null != conn){
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+```java
+/**
+	增强代理类执行体
+*/
+public class DefaultMapperProxy implements InvocationHandler {
+
+    private Map<String, Mapper> mappers ;
+    private Connection conn;
+
+    public DefaultMapperProxy(Map<String, Mapper> mappers ,Connection conn){
+        this.mappers = mappers;
+        this.conn = conn;
+    }
+
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 1. 获取方法名
+        String methodName = method.getName();
+        // 2. 方法所在类的名称
+        String className = method.getDeclaringClass().getName();
+        // 3. 拼接mappers key
+        String key = className+"."+methodName;
+        Mapper mapper = mappers.get(key);
+        // 4.判断是mapper对象是否存在
+        if(mapper==null){
+            throw new IllegalArgumentException("参数有误！！");
+        }
+        return new Executor().selectList(mapper,conn);
+    }
+}
+```
 
 
 
