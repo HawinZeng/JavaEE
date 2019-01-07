@@ -298,7 +298,7 @@ public class GenericTest {
 
 当然这并不是泛型方法的全部，泛型方法可以出现杂任何地方和任何场景中使用。但是有一种情况是非常特殊的，当泛型方法出现在泛型类中时，我们再通过一个例子看一下
 
-```
+```java
 public class GenericFruit {
     class Fruit{
         @Override

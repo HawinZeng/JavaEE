@@ -140,7 +140,7 @@ public void findByNameTest(){
 > ```
 >
 > ```sql
-> -- 不推荐使用，直接使用的是Statement对象
+> -- 不推荐使用，直接使用的是Statement对象, ${value}是固定的，不能是${name}
 > select * from user where username like '%${value}%'
 > ```
 
