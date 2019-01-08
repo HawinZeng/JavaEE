@@ -86,7 +86,7 @@ public class UserServiceImpl implements IUserService {
 > </beans>
 > ```
 
-- #### 问题：如何创建带参数的构造器的对象？
+- #### 问题：如何创建带参数的构造器的对象？(待解决！)
 
 
 
@@ -216,6 +216,7 @@ public class Client {
         <property name="runner" ref="runner"/>
     </bean>
 
+     <!--runner配置，多例，防止多个dao调用，线程干扰-->
     <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
         <constructor-arg name="ds" ref="dataSource"/>
     </bean>
@@ -236,7 +237,11 @@ public class Client {
 </beans>
 ```
 
-> ##### runner 需要多例，由于是通过数据源创建对象，若是单例，则数据源连接池就没有什么作用了。这样在并发时，多个dao调用runner，容易引发线程干扰，同时也影响性能，因为没有用连接池了！
+> ##### runner 若是单例，多个dao调用runner，容易引发［线程干扰］！（？）
+>
+> ##### 由于不能dao的runner需要独立，不能共享，若共享，一些缓存数据可能会造成其它查询出现误差！
+>
+> ##### 若多个service调用dao，这个dao肯定是共享的，否则就dao就没有意义了！所以，dao设置单例为佳，而runner要设置为多例！（不一定要并发！！！）
 
 ```java
 // 1. dao
