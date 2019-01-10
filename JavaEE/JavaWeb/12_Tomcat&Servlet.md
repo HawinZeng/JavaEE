@@ -204,7 +204,7 @@
 
 3. 实现接口中的抽象方法;
 
-4.  配置Servlet :  在web.xml中配置如下
+4. 配置Servlet :  在web.xml中配置如下
 
    ```xml
        <!-- 配置servlet -->
@@ -219,6 +219,7 @@
        </servlet-mapping>
    ```
 
+   > #### 详情：[web.xml配置详解]()
 
 
 ### 3.3、执行原理：步骤如下

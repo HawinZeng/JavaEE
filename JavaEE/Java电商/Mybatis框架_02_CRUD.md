@@ -169,6 +169,18 @@ public void testFindCount(){
 
   基本类型、引用类型（String类型）、实体类型（POJO类型）
 
+  > ##### POJO : Plain Ordinary Java Object  简单的Java对象，实际就是普通JavaBeans，是为了避免和EJB混淆所创造的简称。
+  >
+  > ##### POJO  vs  JavaBean区别：
+  >
+  > ```properties
+  > 1. POJO: 普通Java类，只具有getter/setter方法的那种类。它不包含业务逻辑或持久逻辑等，但不是JavaBean、EntityBean等，不具有任何特殊角色和不继承或不实现任何其它Java框架的类或接口。
+  > 
+  > 2. JavaBean: JavaBean则比POJO复杂很多， Java Bean 是可复用的组件，对 Java Bean 并没有严格的规范，理论上讲，任何一个 Java 类都可以是一个 Bean 。但通常情况下，由于 Java Bean 是被容器所创建（如 Tomcat) 的，所以 Java Bean 应具有一个无参的构造器，另外，通常 Java Bean 还要实现 Serializable 接口用于实现 Bean 的持久性。 Java Bean 是不能被跨进程访问的。JavaBean是一种组件技术，就好像你做了一个扳子，而这个扳子会在很多地方被拿去用，这个扳子也提供多种功能(你可以拿这个扳子扳、锤、撬等等)，而这个扳子就是一个组件。
+  > 
+  > 3.一般在web应用程序中建立一个数据库的映射对象时，我们只能称它为POJO。
+  > ```
+
 - #### 传递 pojo 包装对象案例：
 
   ```xml
