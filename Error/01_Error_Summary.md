@@ -1,6 +1,6 @@
 # 01 Error Summary
 
-**Issue-01:**
+#### Issue-01:
 
 ```
 'while' statement cannot complete without throwing an exception.
@@ -16,7 +16,7 @@ Reports for, while, or do statements which can only exit by throwing an exceptio
 
 
 
-**Issue-02:**
+#### Issue-02:
 
 ```java
 Unchecked call to 'getConstructor(Class<?>...)' as a member of raw type 'java.lang.Class' less... (⌘F1) 
@@ -33,7 +33,7 @@ Inspection info: Signals places where an unchecked warning is issued by the comp
 
 
 
-**issue-03:**
+#### issue-03:
 
 ```
 ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.
@@ -52,7 +52,7 @@ ERROR 1820 (HY000): You must reset your password using ALTER USER statement befo
 
 
 
-**issue-04:**
+#### issue-04:
 
 ```java
 'catch' branch identical to 'ClassNotFoundException' branch less... 
@@ -93,7 +93,7 @@ This inspection only reports if the project or module is configured to use a lan
 
 
 
-**issue-05:**
+#### issue-05:
 
 ```
 Intellij idea 出现错误 error:java: 无效的源发行版: 11解决方法!!
@@ -103,7 +103,7 @@ Intellij idea 出现错误 error:java: 无效的源发行版: 11解决方法!!
 
 
 
-##### issue-06:
+#### issue-06:
 
 ```java
 Caused by: java.lang.IllegalStateException: ContainerBase.addChild: start: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/day16]]
@@ -127,7 +127,7 @@ Caused by: java.lang.IllegalArgumentException: The servlets named [cn.itcast.coo
 
 
 
-##### issue-07:
+#### issue-07:
 
 ```java
 // 运行maven项目是发现如下警告
@@ -140,7 +140,17 @@ Warning:java: 源值1.5已过时, 将在未来所有发行版中删除
 
 
 
+#### issue-8:
 
+```
+部署本地maven项目时，发现如下error：
+
+Error:Cannot build artifact 'springmvc_day02_fileserver:war exploded' because it is included into a circular dependency (artifact 'springmvc_day02_fileserver:war exploded', artifact 'springmvc_day02_02_fileupload:war exploded')
+```
+
+> 报个这个错的意思，你大概在编译项目的时候，你构建项目的时候，你点的是build project；而不是选择rebuild project，导致重复的依赖。
+>
+> 这时候找到项目目录中的.idea目录，在进入artifacts文件目录，发现里面有两个重复的文件，删除即可解决错误。
 
 
 

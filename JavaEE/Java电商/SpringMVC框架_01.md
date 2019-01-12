@@ -83,6 +83,8 @@ MVC全名是Model View Controller 模型视图控制器,每个部分各司其职
 
 ## 二、SpringMVC 的入门
 
+解决加载慢的问题： 
+
 ### 2.1、入门案例：
 
 - #### pom.xml
@@ -528,6 +530,31 @@ public String bindServlet(HttpServletRequest request, HttpServletResponse respon
 }
 ```
 
+### 3.6、中文乱码解决 -- 添加过滤器
+
+```xml
+<filter>
+    <filter-name>characterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>characterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+```
+
+> ##### 注意约束版本：2.3版本及之前的是有顺序要求的，2.4开始可以不关心顺序了。
+>
+> ##### 问题：tomcat7的乱码也统一解决了吗？？
+
 
 
 ## 四、常用的注解
@@ -597,11 +624,274 @@ public class AnnController {
 	required: 是否必须提供占位符。
 ```
 
+- #### REST 风格 URL （表现层的状态转移）
+
+  ```properties
+  1. 什么是Rest？
+  	1.1: REST（英文：Representational State Transfer，简称REST、表现层状态转移）描述了一个架构样式的网络系统，比如 web 应用程序。它首次出现在 2000 年 Roy Fielding 的博士论文中，Roy Fielding是 HTTP 规范的主要编写者之一。在目前主流的三种Web服务交互方案中，REST相比于SOAP（Simple Object Access protocol，简单对象访问协议）以及XML-RPC更加简单明了，无论是对URL的处理还是对Payload的编码，REST都倾向于用更加简单轻量的方法设计和实现。值得注意的是REST并没有一个明确的标准，而更像是一种设计的风格。
+  	1.2: 一种软件架构风格、设计风格，而不是标准，只是提供了一组设计原则和约束条件。它主要用于客户端和服务器交互类的软件。
+  	
+  2. 作用: 
+  	2.1: 它本身并没有什么实用性,其核心价值在于如何设计出符合 REST 风格的网络接口、替换传统SOAP Web服务的流行方案。
+  	2.2: 基于这个风格设计的软件可以更简洁，更有层次，更易于实现缓存等机制。
+  
+  3. restful 的优点: 结构清晰、符合标准、易于理解、扩展方便,所以正得到越来越多网站的采用。
+  
+  4. restful 的特性:
+  	4.1 资源(Resources): 网络上的一个实体,或者说是网络上的一个具体信息。而它可以是一段文本、一张图片、一首歌曲、一种服务,总之就是一个具体的存在。可以用一个 URI(统一资源定位符)指向它,每种资源对应一个特定的 URI 。要获取这个资源,访问它的 URI 就可以,因此 URI 即为每一个资源的独一无二的识别符。
+  	4.2 表现层(Representation): 把资源具体呈现出来的形式,叫做它的表现层 (Representation)。比如,文本可以用 txt 格式表现,也可以用 HTML 格式、XML 格式、JSON 格式表现,甚至可以采用二进制格式。
+  	4.3 状态转化(State Transfer):每发出一个请求,就代表了客户端和服务器的一次交互过程。
+  		HTTP 协议,是一个无状态协议,即所有的状态都保存在服务器端。因此,如果客户端想要操作服务器,
+  必须通过某种手段,让服务器端发生“状态转化”(State Transfer)。而这种转化是建立在表现层之上的,所以 就是 “表现层状态转化”。具体说,就是 HTTP 协议里面,四个表示操作方式的动词:
+  		GET、POST、PUT、 DELETE。它们分别对应四种基本操作:
+  			GET 用来获取资源,
+  			POST 用来新建资源,
+  			PUT 用来更新资源,
+  			DELETE 用来 删除资源。
+  			
+  	restful 的示例:
+  		/account/1  HTTP GET : 得到 id = 1 的 account
+  		/account/1  HTTP DELETE: 删除 id = 1 的 account
+  		/account/1  HTTP PUT: 更新 id = 1 的 account
+  ```
+
+- #### 代码示范
+
+  ```java
+  @Controller
+  public class RestfulController {
+  
+      @RequestMapping(value = "/rest",method = RequestMethod.GET)
+      public String testRestful_1(){
+          System.out.println("Rest1风格执行了.....");
+          return "success";
+      }
+  
+      @RequestMapping(value = "/rest",method = RequestMethod.POST)
+      public String testRestful_2(){
+          System.out.println("Rest2风格执行了.....");
+          return "success";
+      }
+  	
+      @RequestMapping(value = "/rest/{id}",method = RequestMethod.GET)
+      public String testRestful_3(@PathVariable(name = "id") int id){ // 注解name值可以省略，若赋值，一定要与占位符名称一致
+          System.out.println("Rest3风格执行了....."+id);
+          return "success";
+      }
+  }
+  ```
+
+  ```xml
+  <body>
+      <!-- 访问testRestful_1 -->
+      <h3><a href="rest">rest1 测试</a></h3> 
+      <hr>
+      
+      <!-- 访问testRestful_2 -->
+      <form action="rest" method="post"> 
+          姓名：<input type="text" name="username"><br>
+          密码：<input type="text" name="password"><br>
+          <input type="submit" value="提交"><br>
+      </form>
+      <hr>
+      
+     	<!-- 访问testRestful_3 -->
+      <form action="rest/10" method="get">
+          姓名：<input type="text" name="username"><br>
+          密码：<input type="text" name="password"><br>
+          <input type="submit" value="提交"><br>
+      </form>
+      <hr>
+      
+      <!-- 访问将报405错误 -->    
+      <form action="rest/12" method="post">
+          姓名：<input type="text" name="username"><br>
+          密码：<input type="text" name="password"><br>
+          <input type="submit" value="提交"><br>
+      </form>
+  </body>
+  ```
+
+- #### 基于 HiddentHttpMethodFilter 的示例（了解）
+
+  由于浏览器只有get，post请求，所以需要引入HiddentHttpMethodFilter过滤器来模拟put，delete请求！
+
+  ```
+  
+  ```
+
+  > 其他方式模拟：WebClient，浏览器插件都更简单！
+
+### 4.4、RequestHeader注解
+
+```properties
+作用:
+	用于获取请求消息头。
+属性:
+	value:提供消息头名称 required:是否必须有此消息头
+注:
+	在实际开发中一般不怎么用。
+```
+
+```java
+// 作用：获取指定的请求头信息
+@RequestMapping("/testRequestHeader")
+public String testRequestHeader(@RequestHeader(name = "Accept") String header){
+    System.out.println("testRequestHeader 执行了111111111");
+    System.out.println(header);
+    return "success";
+}
+-------------
+// testRequestHeader 执行了111111111
+// text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8   
+```
+
+### 4.5、CookieValue注解
+
+```properties
+作用:
+	用于把指定 cookie 名称的值传入控制器方法参数。
+属性:
+	value:指定 cookie 的名称。 required:是否必须有此 cookie。
+```
+
+```java
+@RequestMapping("/testCookieValue")
+public String testCookieValue(@CookieValue(name = "JSESSIONID",required = false) String cookieValue){
+    System.out.println("testCookieValue 执行了!!");
+    System.out.println(cookieValue);
+    return "success";
+}
+--------------
+// testCookieValue 执行了!!
+// 0DE75FA100953C303E75697BF1C89305 
+```
+
+### 4.6、ModelAttribute注解
+
+```properties
+作用:
+	该注解是 SpringMVC4.3 版本以后新加入的。它可以用于修饰方法和参数。
+	出现在方法上,表示当前方法会在控制器的方法执行之前,先执行。它可以修饰没有返回值的方法,也可 以修饰有具体返回值的方法。
+	出现在参数上,获取指定的数据给参数赋值。
+属性:
+	value:用于获取数据的 key。key 可以是 POJO 的属性名称,也可以是 map 结构的 key。 应用场景:
+  	当表单提交数据不是完整的实体类数据时,保证没有提交数据的字段使用数据库对象原来的数据。
+	例如:
+		我们在编辑一个用户时, 用户有一个创建 信息字段,该字段 的值是不允许被 修改的。在提交表 单数据是肯定没有此字段的内容,一旦更新会把该字段内容置为 null,此时就可以使用此注解解决问题。
+```
+
+```xml
+<form action="testModelAttribute" method="post">
+    姓名：<input type="text" name="username"><br>
+    年龄：<input type="text" name="age"><br>
+    <input type="submit" value="提交"><br>
+</form>
+```
+
+```java
+// 由于上面表单提交只有两个属性值，那么user的birthday就会为null
+@RequestMapping("/testModelAttribute")
+public String testModelAttribute(@ModelAttribute(name = "user") User user){
+    System.out.println("testModelAttribute 执行了!!");
+    System.out.println(user);
+    return "success";
+}
+
+// 通过此注解，可以事先获取表单某些值，然后可以查询数据库。然后就可以将birthday传递给上面的方法user
+// 方式1. 带返回值的方式！
+// 若只有一个情况，可以不要属性。但若指明属性值，调用就要一致。如上user的birthday依然是个null。因为下面的是user1，而取值时属性值是user。
+@ModelAttribute(name = "user1") 
+public User showUser(String username){
+    User user = new User();
+    // 模拟数据库查找，这里直接赋值了
+    user.setUsername(username);
+    user.setAge(18);
+    user.setBirthday(new Date());
+    return user;
+}
+
+// 方式2: 不带返回值方式。那么就必须使用一个map去接收。然后ModelAttribute的name属性要对应map的key
+@ModelAttribute
+public void showUser(String username, Map<String,User> map){
+    User user = new User();
+    // 模拟数据库查找，这里直接赋值了
+    user.setUsername(username);
+    user.setAge(18);
+    user.setBirthday(new Date());
+    map.put("user",user);
+}
+
+-------------------------
+// testModelAttribute 执行了!!
+// User{username='张三', age=28, birthday=Fri Jan 11 10:20:15 CST 2019}
+```
 
 
 
+### 4.7、SessionAttribute注解
 
+```properties
+作用:
+  	用于多次执行控制器方法间的参数共享。
+属性:
+	value: 用于指定存入的属性名称 
+	type: 用于指定存入的数据类型。
+	
+	当然，我们可以直接使用Servlet的原生API，进行系列的session操作，但是这就违背了springMVC的初衷，又将代码耦合起来了！所以，此时，springMVC提供的SessionAttribute注解，以及系列对应的API，搞定session的操作。	参考如下：
+```
 
+```html
+<body> 
+    <a href="saveSession">保存Session</a>
+    <br/>
+
+    <a href="getSession">获取Session</a>
+    <br/>
+
+    <a href="deleteSession">删除Session</a>
+    <br/>
+</body>
+```
+
+```java
+@Controller
+@SessionAttributes(names = "msg") // 只能作用在类上，相当于同时存一份到session中
+public class RestfulController {
+
+    @RequestMapping("/saveSession")
+    public String saveSession(Model model){
+        System.out.println("testSessionAttribute 执行了!!");
+        model.addAttribute("msg","我是大侠！"); // 相当于在request域存一个msg
+        return "success";
+    }
+
+    @RequestMapping("/getSession")
+    public String getSession(ModelMap model){
+        System.out.println("getSessionAttribute 执行了!!");
+        String msg = (String) model.get("msg"); // 在session中取数据
+        System.out.println(msg); 
+        return "success";
+    }
+
+    @RequestMapping("/deleteSession")
+    public String deleteSession(SessionStatus status){
+        System.out.println("deleteSessionAttribute 执行了!!");
+        status.setComplete(); // 清除session的数据
+        return "success";
+    }
+}
+------------------------
+testSessionAttribute 执行了!!
+    
+getSessionAttribute 执行了!!
+我是大侠！
+
+deleteSessionAttribute 执行了!!
+    
+getSessionAttribute 执行了!!
+null   
+```
 
 
 
