@@ -500,6 +500,14 @@ update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
 
 
 ```sql
+create database if not exists ssm default character set utf8;
+use ssm_web;
+create table account(
+	id int primary key auto_increment,
+	name varchar(30) not null,
+	money double default null
+) Engine=InnoDB default charset=utf8;
+
 insert into stu values( 2,'张无忌',25,'成都',89,92),( 3,'赵敏',24,'北京',95,98),
 ( 4,'张三丰',88,'成都',97,92),( 5,'郭靖',45,'郑州',90,82),(6,'黄蓉',42,'广州',99,100),
 ( 7,'杨过',26,'郑州',92,93),( 8,'小龙女',30,'西安',98,99),(9,'黄药师',66,'广州',95,96),

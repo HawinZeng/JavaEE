@@ -80,6 +80,8 @@
 > root管理员的home目录root
 >
 > 其他用户的home目录home目录中
+>
+> ##### mac os：sudo -i 进入管理员root目录 / exit 退出管理员目录
 
 
 
@@ -321,13 +323,13 @@ mkdir test && cd test
 ### 4.5、 网络通讯命令
 
 ```shell
-ifconfig  显示或设置网络设备。
+ifconfig  显示或设置网络设备。    --->  windows: ipconfig
 	ifconfig  显示网络设备
 	ifconfig eth0 up 启用eth0网卡
 	ifconfig eth0 down  停用eth0网卡 
 
 ping   探测网络是否通畅。
-	ping 192.168.0.1 
+	ping 192.168.0.1  －－－ ctrl＋c中断，不分windows，mac，Linux
 
 netstat 查看网络端口。
 	netstat -an | grep 3306 查询3306端口占用情况
