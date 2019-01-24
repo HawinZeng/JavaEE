@@ -63,7 +63,10 @@ select * from emp inner JOIN dept on emp.`dept_id`=dept.`id`;
 select 字段列表 from 表1 left [outer] join 表2 on 条件；
 ```
 
-
+> ```sql
+> -- using关键字的外连接查询，前提是两张表有deptno相同的字段，否则查询不了！
+> select * from dept d left outer join emp e using(deptno); 
+> ```
 
 ### 1.4、子查询：查询中嵌套查询，称嵌套查询为子查询。
 
@@ -99,6 +102,51 @@ select * from dept t1,(select * from emp where emp.`join_date` > '2011-11-11') t
 >
 > ```sql
 > select * from dept,emp where dept.`id`=emp.`dept_id` AND emp.`join_date` > '2011-11-11';
+> ```
+
+### 1.5、联合／连接查询  －－ union
+
+```sql
+select name,id,age from students where age<=20
+union
+select name,id,age from studnets where id in (14,15);
+
+----等效于-----
+select name,id,age from students
+where age <= 20 or id in (14,15);
+```
+
+> 总结：
+>
+> ```properties
+> union: 联合的意思，即把两次或多次查询结果合并起来,并消去表中任何重复行;
+> 要求: 两次查询的列数必须一致(数量，顺序都一致), 列也必须拥有相似的数据类型;
+> 推荐: 列的类型可以不一样，但推荐查询的每一列，想对应的类型以一样;
+> 可以来自多张表的数据: 多次sql语句取出的列名可以不一致，此时以第一个sql语句的列名为准。
+> 
+> 1. 如果不同的语句中取出的行，有完全相同(这里表示的是每个列的值都相同)，那么union会将相同的行合并，最终只保留一行。也可以这样理解，union会去掉重复的行。
+> 2. 如果不想去掉重复的行，可以使用union all。
+> 3. 如果子句中有order by,limit，需用括号()包起来。推荐放到所有子句之后，即对最终合并的结果来排序或筛选，可以对union之后的数据进行排序和分页等操作。
+> ```
+>
+> ```sql
+> ---- 案例 ----
+> ------table: a------             ------table: b------  
+> name   age                        name2   age2 
+> A1      1                          A1      1
+> A2      2                          B1      2
+>                                    B2      3
+> ---------------------            ---------------------
+> 
+> select * from a union (all) select * from b;
+> -------------------
+> 	name    age 
+> 	 A1      1                          
+> 	 A2      2 
+> 	 B1      2
+> 	 B2      3
+> 	(A1      1)   -- all : 不去重
+> -------------------
 > ```
 
 

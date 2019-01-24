@@ -101,23 +101,23 @@ sudo rm -rf /var/db/receipts/com.mysql.*
   * 表：相当于文件
   * 数据：相当于数据
 
-```
+#### 5、MySQL密码修改：参考后面的DCL语句详解
+
+```properties
 MAC OS 终端进入MySQL步骤：
-先在偏好设置里启动mysql服务
-获取超级权限
-在终端输入代码
-sudo su
-输入完后获取超级权限 终端显示 sh-3.2#
-输入本机密码（Apple ID密码）
-接着通过绝对路径登陆 代码
-/usr/local/mysql/bin/mysql -u root -p
-再输入mysql密码（我的密码设置为root）
-登陆成功
-退出代码
-quit
-退出成功 bye
-最后退出sh-3.2#超级权限 代码
-exit
+ 1. 先在偏好设置里启动mysql服务
+ 2. 获取超级权限: 
+	2.1 在终端输入代码 : sudo su
+			输入完后获取超级权限 
+			输入本机密码（Apple ID密码）
+	2.2 终端显示: sh-3.2#
+3. 接着通过绝对路径登陆
+	代码: sh-3.2# /usr/local/mysql/bin/mysql -u root -p
+	再输入mysql密码（我的密码设置: root）
+		登陆成功: mysql> 显示出来
+4. 退出代码: quit
+	退出成功显示: bye
+5. 最后退出sh-3.2#超级权限 代码: exit
 ```
 
 
@@ -497,7 +497,22 @@ update 表名 set 列名1 = 值1, 列名2 = 值2,... [where 条件];
   
   ```
 
+- ### 联合查询 －－union
 
+  ```sql
+  select name,id,age from students where age<=20
+  union
+  select name,id,age from studnets where id in (14,15);
+  
+  ----等效于-----
+  select name,id,age from students
+  where age <= 20 or id in (14,15);
+  ```
+
+
+## 扩展：
+
+#### 1. 创建database，table 全属性写法
 
 ```sql
 create database if not exists ssm default character set utf8;
@@ -514,3 +529,95 @@ insert into stu values( 2,'张无忌',25,'成都',89,92),( 3,'赵敏',24,'北京
 (10,'杨康',44,'西安',78,65),(11,'欧阳锋',60,'西安',34,58),(12,'老顽童',58,'郑州',23,36),
 ( 13,'龙哥',35,'上海',69,72),( 14,'徐子龙',15,'上海',88,80);
 ```
+
+
+
+#### 2. 数据库统一赋值，添加列赋值及运算
+
+```sql
+-- 增加列，并统一赋默认值1000
+alter table user add salary double default 1000 
+-- 删除列
+alter table user drop [column] salary
+-- 统一赋值，无需where即可
+update user set comm=3000 
+
+alter table user add birhday date default '2008-09-22'
+alter table user add createtime timestamp default '2018-12-22 13:55:32'
+alter table user add  jointime date default '2012-06-23'
+
+-- 1. 参与算术运算 ＋ － ＊ ／ ％求余 ： int，float、double
+select id, age, id + age from user 
+
+-- 2. 拼接字段 －Concat()函数 ：大多数DBMS使用+或者||来实现拼接，mysql则使用Concat()函数来实现；
+
+```
+
+> 细节详解： http://www.runoob.com/mysql/mysql-data-types.html
+
+
+
+#### 3. 经典案例
+
+- ##### 1、MySQL中竖表和横表之间的相互转换
+
+```sql
+
+------bank:竖表----------    ----------infos:横表------------
+year  moth  account          year  m1    m2    m3    m4
+1991	1	1.1        		 1991  1.1  1.2   1.3   1.4
+1991	2	1.2				 1992  2.1  2.2   2.3   2.4
+1991	3	1.3
+1991	4	1.4     ----> 
+1992	1	2.1
+1992	2	2.2     <----
+1992	3	2.3
+1992	4	2.4
+-----------------            ---------------------------
+---- 竖表变横表
+select year,
+	max(case month when '1' then account else 0 end) m1,
+	max(case month when '2' then account else 0 end) m2,
+	max(case month when '3' then account else 0 end) m3,
+	max(case month when '4' then account else 0 end) m4,
+from bank group by year;
+
+--- 横表变竖表
+select year, '1' as month, m1 as account from infos
+	UNION 
+	select year, '2' as month, m2 as account from infos
+	UNION
+	select year, '3' as month, m3 as account from infos
+	UNION
+	select year, '4' as month, m4 as account from infos
+order by year;
+--------------
+select * from(
+	select year, '1' as month, m1 as account from infos
+	UNION 
+	select year, '2' as month, m2 as account from infos
+	UNION
+	select year, '3' as month, m3 as account from infos
+	UNION
+	select year, '4' as month, m4 as account from infos) tb
+order by year;
+```
+
+- ##### 2、查询出每门课都大于80 分的学生姓名
+
+```sql
+---------student---------------
+name   kecheng   score
+张三     语文       81
+张三     数学       75
+张三     英语       82
+李四     语文       76
+李四     数学       90
+李四     英语       78
+王五     语文       81
+王五     数学       100
+王五     英语       90
+------------------------
+select s.name from student s group by s.name having min(s.score) > 80;
+```
+

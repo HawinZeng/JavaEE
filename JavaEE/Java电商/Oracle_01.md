@@ -70,6 +70,137 @@
 
 
 
+#### 1.6、Oracle 初始设置 / 问题解决 
+
+```sql
+-- 1. 最初始的账号／密码： 
+	system、sys,sysman,dbsnmp 初始化账户
+	密码: 就是你安装数据库时，设置的密码，如 orcl。
+
+-- 2. 在cmd终端进入Oracle命令：
+-- 2.1 直接sqlplus登录oracle实例
+sqlplus system/orcl@[192.168.186.141:1521/]orcl [as sysdba];
+sqlplus system/orcl@orcl as sysdba; -- 连接本地oracle
+-- 2.2 先进oracle，再连接实例
+sqlplus /nolog; 
+SQL> conn system/orcl{@[192.168.186.141:1521]/orcl} [as sysdba]
+
+-- 3. 进入oracle后，查看实例是否启动
+SQL> select status from v$instance;
+--- 如下结果：代表已启动 ----         ---- 如下结果：代表没有连接，需要先用户登录连接----
+STATUS       					   SP2-0640:not connected
+------------
+OPEN
+
+-- 4. 登录时，错误监--> (听程序当前无法识别连接描述符中请求的服务)
+ORA-12514:listener does not currently know of service requested in connect descriptor;
+--分析：
+-- 4.1 这个错误，当OracleServiceORCL服务关闭时，也是必然提示的。这时，我们启动服务即可；
+	
+-- 4.2 关键是OracleServiceORCL服务正常，依然报错！
+	-- 1) 检查$ORACLE_BASE/diag/tnslsnr/DB-Server/listener/alert下的日志log.xml (Linux,windows下搜索alert即可).
+		iP地址不一致，修正即可;
+		实例名称设置有误，也修正即可；
+		其他情况阅读具体内容修正；
+	-- 2) 检查网络是否正常： ping 公网或自身ip， tnsping orcl(数据库实例)。
+		ping 192.168.186.141;
+		tnsping orcl;
+	-- 3) 检查监听服务是否正常： lsnrctl status
+	...
+	> instance 'PLSEExtProc', status UNKNOWN, has 1 handler(s) for this service...
+    > The command command completed successfully.
+    从上面输出看，实例'PLSEExtProc'被监听到了。那为啥我们是用orcl实例呢？
+    	-------- # tnsnames.ora： 监听器的配置文件--------
+            ORCL =
+              (DESCRIPTION =
+                (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.186.141)(PORT = 1521))
+                (CONNECT_DATA =
+                  (SERVER = DEDICATED)
+                  (SERVICE_NAME = orcl)
+                )
+              )
+
+            EXTPROC_CONNECTION_DATA =
+              (DESCRIPTION =
+                (ADDRESS_LIST =
+                  (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1))
+                )
+                (CONNECT_DATA =
+                  (SID = PLSExtProc)
+                  (PRESENTATION = RO)
+                )
+              )
+-------------------------listener.ora : 监听器-----------------------------------       
+            SID_LIST_LISTENER =
+              (SID_LIST =
+                (SID_DESC =
+                  (SID_NAME = PLSExtProc)
+                  (ORACLE_HOME = C:\oracle\product\10.2.0\db_1)
+                  (PROGRAM = extproc)
+                )
+              )
+
+            LISTENER =
+              (DESCRIPTION_LIST =
+                (DESCRIPTION =
+                  (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1))
+                  (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.186.141)(PORT = 1521))
+                )
+              )
+----------------------------------------------------------------------------------------- 
+  从上看，监听器的配置文件将实例'PLSExtProc' 的TCP协议连接名称修改为SERVICE_NAME = orcl。同时在最外层也有个别名ORCL，方便在PL/SQL登录时选择；
+  
+  正常情况： lsnrctl status (查看是有orcl的实例)
+  Services Summary...
+	Service "PLSExtProc" has 1 instance(s).
+  		Instance "PLSExtProc", status UNKNOWN, has 1 handler(s) for this service..
+	Service "orcl" has 1 instance(s).
+  		Instance "orcl", status READY, has 1 handler(s) for this service...
+	Service "orclXDB" has 1 instance(s).
+  		Instance "orcl", status READY, has 1 handler(s) for this service...
+	Service "orcl_XPT" has 1 instance(s).
+  		Instance "orcl", status READY, has 1 handler(s) for this service...
+	The command completed successfully
+    
+```
+
+> ##### 总结：
+>
+> ##### 1、下次有机会要好好解决下！ 能够tnsping orcl ，但是 lsnrctl status 抓不到orcl！
+>
+> ##### 2、listener.ora 、tnsnames.ora都可以放在C:\instantclient_12_1\config目录下。config文件夹自创建。当此文件夹有这两个文件后，oracle重装的C:\oracle\product\10.2.0\db_1\NETWORK\ADMIN目录将不在有此两个文件。
+
+### 1.7、错误统计／解决
+
+1） PL/SQL 登录Oracle时，会弹出 `using a filter for all users can lead to poor performace`: 
+
+```
+1. 分析：与Oracle的配置无关，在使用plsql左侧的树形目录时候会看到非常多的和当前工作无关的表、视图、序列等，导致打开速度非常慢；
+
+2. 具体解决办法：Tools-->Object browser filter-->选中“my objects”，default-->“确定”，退出再登录；此时只有自己创建的tables，functions，tiggers等；
+```
+
+2）语法不起作用：
+
+```sql
+CREATE TABLE product(
+  id varchar2(32) default SYS_GUID() PRIMARY KEY,
+  productNum VARCHAR2(50) NOT NULL,
+  productName VARCHAR2(50),
+  cityName VARCHAR2(50),
+  DepartureTime timestamp,
+  productPrice Number,
+  productDesc VARCHAR2(500),
+  productStatus INT,
+  CONSTRAINT product UNIQUE (id, productNum)
+);
+-- 上面的SYS_GUID() ，CONSTRAINT product UNIQUE (id, productNum)在一些情况下根本不起作用。为啥？由于我先在ssm用户下创建了product，ssm账户没有创建表空间，导致实际开发无法连接ssm账户对应的product表。于是，重新创建了表空间itcast，然后再创建用户itheima关联表itcast。 此时再用 create table product as select * from ssm.product; 相当于复制表，这种情况下是无法复制 部分属性的，如SYS_GUID() ，CONSTRAINT..UNIQUE等；
+```
+
+
+
+
+
 ## 二、创建表空间[理解]
 
 ```sql
@@ -102,9 +233,9 @@ default tablespace itcast -- 关联的表空间
 
 Oracle 中已存在三个重要的角色:connect 角色,resource 角色,dba 角色。
 
-- ##### CONNECT角色: -- 是授予最终用户的典型权利,最基本的；
+- ##### CONNECT角色: -- 是授予最终用户的典型权利,最基本的；R
 
-- ##### RESOURCE 角色: -- 是授予开发人员的；
+- ##### RESOURCE 角色: -- 是授予开发人员的；CRUD
 
 - ##### DBA 角色:拥有全部特权,是系统最高权限,只有 DBA 才可以创建数据库结构,并且系统权限也需要 DBA 授出,且 DBA 用户可以操作全体用户的任意基表,包括删除；
 
@@ -209,6 +340,8 @@ alter table person rename column gender to sex;
 
 -- 删除一列
 alter table person drop column money;
+
+
 ```
 
 #### 4）表的查询（非数据查询，了解）

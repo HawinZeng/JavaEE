@@ -286,16 +286,22 @@ ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段名称) 
 
 - 命令行：
 
-```shell
-备份： mysqldump -u用户名 -p密码 数据库名称 > 保存的路径
+```sql
+-- 1. 备份： mysqldump -u用户名 -p密码 数据库名称 > 保存的路径
+sh-3.2# /usr/local/mysql/bin/mysqldump -uroot -proot day18 > /Volumes/C/sql/day18.sql 
 ```
 
-```
-还原：
-	1. 登录数据库
+```sql
+-- 2. 还原：source 命令
+-- 按如下步骤执行还原操作: 
+	--1. 登录数据库  
+	sh-3.2# /usr/local/mysql/bin/mysql -uroot -proot
 	2. 创建数据库
+	mysql> create database day018 default character set utf8;
 	3. 使用数据库
+	mysql> use day018;
 	4. 执行文件。source 文件路径
+	mysql> source /Volumes/C/sql/day18.sql; 
 ```
 
 - 图形化工具：简单
