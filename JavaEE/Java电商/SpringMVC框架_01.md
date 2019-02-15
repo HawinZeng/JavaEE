@@ -1,3 +1,5 @@
+archetypeCatalog:internal
+
 # SpringMVC框架_01
 
 ## 一、 SpringMVC 的基本概念

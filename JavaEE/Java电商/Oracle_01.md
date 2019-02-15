@@ -194,7 +194,7 @@ CREATE TABLE product(
   productStatus INT,
   CONSTRAINT product UNIQUE (id, productNum)
 );
--- 上面的SYS_GUID() ，CONSTRAINT product UNIQUE (id, productNum)在一些情况下根本不起作用。为啥？由于我先在ssm用户下创建了product，ssm账户没有创建表空间，导致实际开发无法连接ssm账户对应的product表。于是，重新创建了表空间itcast，然后再创建用户itheima关联表itcast。 此时再用 create table product as select * from ssm.product; 相当于复制表，这种情况下是无法复制 部分属性的，如SYS_GUID() ，CONSTRAINT..UNIQUE等；
+-- 上面的SYS_GUID() ，CONSTRAINT product UNIQUE (id, productNum)在一些情况下根本不起作用。为啥？由于我先在ssm用户下创建了product，ssm账户表空间没有关联具体的物理数据文件，导致实际开发无法连接ssm账户对应的product表。于是，重新创建了表空间itcast，然后再创建用户itheima关联表itcast。 此时再用 create table product as select * from ssm.product; 相当于复制表，这种情况下是无法复制 部分属性的，如SYS_GUID() ，CONSTRAINT..UNIQUE等；
 ```
 
 
@@ -673,14 +673,3 @@ from (
   where rownum < 11) tt ----rownum行号不能写上大于一个正数。
 where tt.rn > 5; 
 ```
-
-
-
-
-
-
-
-
-
-
-
