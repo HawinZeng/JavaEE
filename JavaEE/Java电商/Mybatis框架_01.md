@@ -58,6 +58,12 @@
 
 ##### 那么，持久层技术解决方案框架技术：Mybatis！！！
 
+> 持久层框架有哪些？
+>
+> Mybatis、ibatis、Hibernate
+
+
+
 
 
 ## 二、Mybatis入门
