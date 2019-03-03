@@ -70,7 +70,7 @@ public class UserServiceImpl implements IUserService {
 
 > ##### 单独这样配置还是不行的！还需要修正bean.xml文件！！！
 >
-> ##### 需要添加xmlns:context这个约束，从而使用 `<context:component-scan.../>`标签！
+> ##### 1、需要添加xmlns:context这个约束，从而使用 `<context:component-scan.../>`标签！
 >
 > ```xml
 > <?xml version="1.0" encoding="UTF-8"?>
@@ -85,10 +85,26 @@ public class UserServiceImpl implements IUserService {
 >     <context:component-scan base-package="com.eoony"/>
 > </beans>
 > ```
+>
+> ##### 2、pom.xml: 也只需暂时spring-context. 即spring容器
+>
+> ```xml
+> <dependency>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-context</artifactId>
+>     <version>5.0.2.RELEASE</version>
+> </dependency>
+> <!--用spring test替换junit，简化测试-->
+> <dependency>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-test</artifactId>
+>     <version>5.0.2.RELEASE</version>
+> </dependency>
+> ```
 
 - #### 问题：如何创建带参数的构造器的对象？(待解决！)
 
-
+> ##### 答：一般情况下不会设置带参数构造器，如service，controller之类，都只是一个默认的无参数构造。若实在有，则使用xml配置即可！
 
 
 

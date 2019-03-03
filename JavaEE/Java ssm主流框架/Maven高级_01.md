@@ -80,6 +80,84 @@
 </dependencies>
 ```
 
+> #### 1. jar 包冲突引发的现象：
+>
+> - java.lang.NoSuchMehodError
+> - java.lang.NoClassDefFoundError
+>
+> #### 2. 为啥会有jar冲突？
+>
+> - mvn的传递依赖特性：mvn编译打包除了会引入直接申明的依赖，还会引入间接申明的依赖；
+> - mvn的依赖仲裁规则：
+>   - 按照项目总控POM的DependencyManager版本声明进行仲裁。
+>   - 如无仲裁声明，则按照依赖最短路径确定版本。
+>   - 若相同路径，有严格区间限定的版本优先。
+>   - 若相同路径，无版本区间，则按照[先入为主](https://www.baidu.com/s?wd=%E5%85%88%E5%85%A5%E4%B8%BA%E4%B8%BB&tn=24004469_oem_dg&rsv_dl=gh_pl_sl_csd)原则。
+> - 依赖的scope会影响依赖的影响范围。
+>
+> #### 3. 冲突实例说明：
+>
+> ```xml
+> <dependency>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-beans</artifactId>
+>     <version>4.2.4.RELEASE</version>
+> </dependency>
+> 
+> <dependency>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-context</artifactId>
+>     <version>5.0.2.RELEASE</version>
+> </dependency>
+> 
+> <dependency>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-core</artifactId>
+>     <version>5.0.2.RELEASE</version>
+> </dependency>
+> ```
+>
+> ![](attach/F0-jar-conflict.png)
+>
+> 1) spring-beans: 是4.2.4.Release。会传递依赖spring-core 4.2.4.release版本。而项目按就近原则，依赖的是spring-core 5.0.2.release版本，此时，spring-beans上的spring-core报红色，即冲突。
+>
+> 2）spring-context 5.0.2.release会传递依赖spring-beans 5.0.2.release，而项目导入的是spring-beans 4.2.4.release，因此也报红冲突！同理，spring-aop也是如此！
+>
+> #### 4. 命令行查看冲突: termial
+>
+> - dependency:tree时，我用到了“无处遁形”，其实有时你会发现简单地用dependency:tree往往并不能查看到所有的传递依赖。
+>
+> - 不过如果你真的想要看所有的，必须得加一个-Dverbose参数，这时就必定是最全的了。
+>   全是全了，但显示出来的东西太多，头晕目眩，有没有好法呢？
+>
+> - 当然有了，加上Dincludes或者Dexcludes说出你喜欢或讨厌，dependency:tree就会帮你过滤出来：
+>
+>   如：mvn dependency:tree -Dverbose -Dincludes=asm:asm  指定查看asm依赖的情况。
+>
+> ```shell
+> #由于前面引入的就3个包，没有指定jar包依赖查看
+> HawiniMac:test_001 F3234883$ mvn dependency:tree -Dverbose
+> 
+> [INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ test_001 ---
+> [INFO] com.itcast:test_001:jar:1.0-SNAPSHOT
+> [INFO] +- org.springframework:spring-beans:jar:4.2.4.RELEASE:compile
+> [INFO] |  \- (org.springframework:spring-core:jar:4.2.4.RELEASE:compile - omitted for conflict with 5.0.2.RELEASE)
+> [INFO] +- org.springframework:spring-context:jar:5.0.2.RELEASE:compile
+> [INFO] |  +- org.springframework:spring-aop:jar:5.0.2.RELEASE:compile
+> [INFO] |  |  +- (org.springframework:spring-beans:jar:5.0.2.RELEASE:compile - omitted for conflict with 4.2.4.RELEASE)
+> [INFO] |  |  \- (org.springframework:spring-core:jar:5.0.2.RELEASE:compile - omitted for conflict with 4.2.4.RELEASE)
+> [INFO] |  +- (org.springframework:spring-beans:jar:5.0.2.RELEASE:compile - omitted for conflict with 4.2.4.RELEASE)
+> [INFO] |  +- (org.springframework:spring-core:jar:5.0.2.RELEASE:compile - omitted for conflict with 4.2.4.RELEASE)
+> [INFO] |  \- org.springframework:spring-expression:jar:5.0.2.RELEASE:compile
+> [INFO] |     \- (org.springframework:spring-core:jar:5.0.2.RELEASE:compile - omitted for conflict with 4.2.4.RELEASE)
+> [INFO] \- org.springframework:spring-core:jar:5.0.2.RELEASE:compile
+> [INFO]    \- org.springframework:spring-jcl:jar:5.0.2.RELEASE:compile
+> ```
+>
+> #### 5. 问题：
+>
+> 例如：spring-security-core 5.0.1.release需要依赖spring-core 5.0.3.release，而项目就近导入的是spring-core 5.0.2.release，该如何办呢？
+
 ### 2.2、jar的锁定
 
 ```xml
