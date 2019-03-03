@@ -34,6 +34,9 @@ http://research.itcast.cn/adminlte2-itcast/release/dist/pages/all-admin-index.ht
 
 #### 2.2、类型转换方式
 
+- 如页面传来了一个日期字符串（2019-02-22 15:34:22）为String字段，而实体类的日期为java.util.Date类型。此时，spring封装数据时就会报错。怎么解决呢？那就必须在实体类进行类型转换了。
+- 类型转换的方式有几种：
+
 
 
 ## 三、SSM 环境搭建与产品操作
