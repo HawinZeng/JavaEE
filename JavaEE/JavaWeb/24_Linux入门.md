@@ -93,7 +93,7 @@
 cd app		切换到app目录 
 cd ..		切换到上一层目录 
 cd /		切换到系统根目录 
-cd ~		切换到用户主目录 
+cd ~		切换到用户主目录 (即/root,有时在根目录下是不显示此目录。)
 cd -		切换到上一个所在目录
 ```
 
@@ -207,7 +207,7 @@ tar命令位于/bin目录下，它能够将用户所指定的文件或目录打�
 
 解压 
     tar –xvf xxx.tar
-	tar -xvf xxx.tar.gz -C /usr/aaa
+	tar -zxvf xxx.tar.gz -C /usr/aaa
 ```
 
 ##### 【grep】命令（作用：查找Tomcat——log错误信息，快速定位）
@@ -219,6 +219,21 @@ tar命令位于/bin目录下，它能够将用户所指定的文件或目录打�
 示例：
 grep lang anaconda-ks.cfg  在文件中查找lang
 grep lang anaconda-ks.cfg –color 高亮显示
+
+```
+
+##### 【find】命令（作用：文件查找）
+
+```shell
+$ find path expression # 基本格式
+# 1. 按照文件名查找
+$ find / -name zookeeper-3.4.6.tar.gz  # 全磁盘查看名称为zookeeper-3.4.6.tar.gz的文件
+$ find . -name 'srm*' # 查找当前目录下以‘srm’开头的文件
+
+# 2. 按照文件特征查找
+$ find / -amin -10 #查找在系统中最后10分钟访问的文件
+$ find / -atime -2 #查找在系统中最后48小时访问的文件
+...
 ```
 
 #### 3.6、其他常用命令

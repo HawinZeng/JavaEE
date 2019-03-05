@@ -72,6 +72,8 @@ Eclipse 是一个开放源代码的、基于Java的可扩展开发平台。就�
 
 #### 4、修改项目jre版本和编译版本：（三个jdk版本一致）
 
+右击项目：propertites即可查看下面三个，同时设置！
+
 - JRE System Library :  选择workspace同版本的jdk 1.8
 
 - Java Complier：同JRE一致

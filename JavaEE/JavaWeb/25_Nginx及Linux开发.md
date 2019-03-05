@@ -23,21 +23,23 @@
 
   ##### 1）在linux下一般用scp这个命令来通过ssh传输文件。
 
-  ```java
-  // 1. 从服务器上下载文件
-  scp username@servername:/path/filename /var/www/local_dir（本地目录）
+  ```shell
+  # 1. 从服务器上下载文件
+  $ scp username@servername:/path/filename /var/www/local_dir（本地目录）
   
-  // 2. 上传本地文件到服务器
-  scp /path/filename username@servername:/path  
+  # 2. 上传本地文件到服务器
+  $ scp /path/filename username@servername:/path  
+  $ scp /Volumes/C/Study/Dubbox/zookeeper-3.4.6.tar.gz root@192.168.25.128:/soft
+  # 一定要注意地址正确
   
-  // 3. 从服务器下载整个目录
-  scp -r username@servername:/var/www/remote_dir/（远程目录） /var/www/local_dir（本地目录）
+  # 3. 从服务器下载整个目录
+  $ scp -r username@servername:/var/www/remote_dir/（远程目录） /var/www/local_dir（本地目录）
   
-  // 4. 上传目录到服务器
-  scp  -r local_dir username@servername:remote_dir
+  # 4. 上传目录到服务器
+  $ scp  -r local_dir username@servername:remote_dir
   
-  //  例如
-  scp -r /Volumes/C/toLinux root@120.79.53.76:/usr/local/ 
+  #  例如
+  $ scp -r /Volumes/C/toLinux root@120.79.53.76:/usr/local/ 
   ```
 
   ##### 2）使用第三方软件上传
