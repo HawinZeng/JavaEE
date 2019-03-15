@@ -141,6 +141,22 @@ SOA是Service-Oriented Architecture的首字母简称，它是一种支持面向
     ```shell
     # windows 直接可以使用SecureCRT工具连接Linux。然后alt＋p，使用SFTP界面，put d:\zookeeper-3.4.6.tar.gz上传即可
     
+    # Linux 端口22 
+    
+    win10 系统安装vmware 启动Linux： 
+    1. 二进制转换与此平台上的长模式不兼容，此虚拟环境中的长模式将被禁用”问题；
+    	原因：在使用Windows7 64位操作系统时，无法运行VMWare或MS Virtual server等软件虚拟操作系统。提示为“提示：软件虚拟化与此平台上的长模式不兼容. 禁用长模式. 没有长模式支持, 虚拟机将不能运行 64 位程序. ”产生这个错误的主要原因是现在平常用的VMWare等软件本身都是基于32位的，如果要在其上运行64位虚拟机，需要把虚拟化打开！而Windows7 64位操作系统在默认情况下是关闭的！
+    	解决方法：
+    	方案一：（是终极方案，但是复杂，不推荐）
+    	1） 首现我们需要下载一个绿色的小巧软件（114K），来检测VT虚拟化技术是否开启；【CPU-Z】
+    	2） 如果显示为“NO”，则说明VT虚拟化技术未能成功开启。需要重启笔记本后登录BIOS设置界面，进入“Configuration”菜单，找到 “Intel(R) Virtual Technology”选项，将其值改为“Enabled”，保存退出后登录系统。
+    	
+    	方案二：通过修改VMWare软件设定，临时性解决不兼容问题。但新建虚拟机后，需要再次进行以下设置；（推荐）
+    	1）对虚拟机相对应的.vmx文件进行编辑修改。用记事本打开.vmx文件，找到：vmci0.present=“TRUE”将TRUE改为FALSE或者直接将这行删掉。保存此虚拟机的.vmx文件（可能先要关闭Vm，然后才能保存，再打开VM）。重新运行虚拟机。OK。（注意：刚刚安装好VMware Workstation以后是找不到这个文件的，当你在VMware Workstation中建立了一个虚拟机以后，这个文件才会出现。）
+    	2）[这一步非必要操作]在vm软件界面上，编辑虚拟机设置。在虚拟机设置->选项->客户机隔离->VM通信接口(VMCI)把启用VMCI的钩去掉。点击确定保存。重新运行虚拟机。OK。
+    	
+    
+    
     # unix mac os 
     # 1. 上传：
     $ scp /Volumes/C/Study/Dubbox/zookeeper-3.4.6.tar.gz root@192.168.25.128:/root
@@ -252,7 +268,7 @@ location: 直接FileSystem，选择dubbo.xsd路径
 
 keytype：schema location
 
-key: `http://code.alibabatech.com/schema/dubbo`
+key: `http://code.alibabatech.com/schema/dubbo/dubbo.xsd`
 
 
 
@@ -660,7 +676,7 @@ errorInfo: Failed to execute goal on project basic-core-data: Could not resolve 
 resolution: 先将整个项目install 一下生成父pom信息    再install  utils模块即可
 ```
 
-6.3、erro log-02
+6.3、error log-02
 
 ```properties
 java.lang.IllegalStateException: Failed to check the status of the service com.pinyougou.sellergoods.service.BrandService. No provider available for the service com.pinyougou.sellergoods.service.BrandService from the url zookeeper://192.168.25.129:2181/com.alibaba.dubbo.registry.RegistryService?application=pinyougou-manager-web&dubbo=2.8.4&interface=com.pinyougou.sellergoods.service.BrandService&methods=update,get,delete,selectOptionList,add,getListByPage&pid=3980&revision=0.0.1-SNAPSHOT&side=consumer&timestamp=1501146823396 to the consumer 172.16.17.14 use dubbo version 2.8.4
@@ -668,7 +684,7 @@ java.lang.IllegalStateException: Failed to check the status of the service com.p
 
 > 这种错误是服务层代码没有成功注册到注册中心导致，请检查一下你的服务层代码是否添加了@service注解，并且该注解的包一定是com.alibaba.dubbo.config.annotation包，不是org.springframework.stereotype.Service，这个地方极容易出错。另外还有一个原因就是你的服务层工程由于某些原因没有正常启动，也无法注册到注册中心里。
 
-6.4、erro log-03
+6.4、error log-03
 
 ```properties
 org.I0Itec.zkclient.exception.ZkTimeoutException: Unable to connect to zookeeper server within timeout: 5000	org.I0Itec.zkclient.ZkClient.connect(ZkClient.java:876)	org.I0Itec.zkclient.ZkClient.<init>(ZkClient.java:98)	org.I0Itec.zkclient.ZkClient.<init>(ZkClient.java:92)	org.I0Itec.zkclient.ZkClient.<init>(ZkClient.java:80) com.alibaba.dubbo.remoting.zookeeper.zkclient.ZkclientZookeeperClient.<init>(ZkclientZookeeperClient.java:26)
@@ -676,7 +692,33 @@ org.I0Itec.zkclient.exception.ZkTimeoutException: Unable to connect to zookeeper
 
 > 请检查IP与端口是否填写正确，检查注册中心是否正常启动
 
+6.5、error log4
 
+```properties
+# 在mac系统下运行dubbo项目没有问题，回到家在win10 系统运行sellergood-service服务就有如下错误：
+Caused by: java.lang.RuntimeException: java.io.IOException: invalid constant type: 18
+    at javassist.CtClassType.getClassFile2(CtClassType.java:203)
+    at javassist.compiler.MemberResolver.lookupMethod(MemberResolver.java:110)
+    at javassist.compiler.MemberResolver.lookupMethod(MemberResolver.java:96)
+    at javassist.compiler.TypeChecker.atMethodCallCore(TypeChecker.java:704)
+    at javassist.compiler.TypeChecker.atCallExpr(TypeChecker.java:681)
+...
+    at javassist.compiler.Javac.compileMethod(Javac.java:168)
+    at javassist.compiler.Javac.compile(Javac.java:94)
+    at javassist.CtNewMethod.make(CtNewMethod.java:73)
+    at javassist.CtNewMethod.make(CtNewMethod.java:44)
+    at com.alibaba.dubbo.common.bytecode.ClassGenerator.toClass(ClassGenerator.java:322)
+    at com.alibaba.dubbo.common.bytecode.ClassGenerator.toClass(ClassGenerator.java:293)
+    at com.alibaba.dubbo.common.bytecode.Wrapper.makeWrapper(Wrapper.java:346)
+    at com.alibaba.dubbo.common.bytecode.Wrapper.getWrapper(Wrapper.java:89)
+    at com.alibaba.dubbo.config.ServiceConfig.doExportUrlsFor1Protocol(ServiceConfig.java:430)
+    at com.alibaba.dubbo.config.ServiceConfig.doExportUrls(ServiceConfig.java:285)
+    at com.alibaba.dubbo.config.ServiceConfig.doExport(ServiceConfig.java:246)
+    at com.alibaba.dubbo.config.ServiceConfig.export(ServiceConfig.java:145)
+...
+
+# 由于在公司的jdk版本是1.8，而自己的电脑jdk是9.0。当dubbo调用javassist编译字节码与当前jdk9.0不兼容而出错。 jdk9.0需要将javassist版本升级到3.18.0以上才能解决。javassist 3.11.0-GA需要对应jdk降低到1.8及以下版本。
+```
 
 
 
