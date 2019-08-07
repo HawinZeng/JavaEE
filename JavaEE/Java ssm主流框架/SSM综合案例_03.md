@@ -408,7 +408,7 @@ enum SecurityFilters {
 http标签是自定义标签,我们可以在spring-security-config包中查看META-INF/spring.handlers
 
 ```scheme
-http\://www.springframework.org/schema/security=org.springframework.security.config.SecurityNamespaceHandler
+http://www.springframework.org/schema/security=org.springframework.security.config.SecurityNamespaceHandler
 ```
 
 继续查看SecurityNamespaceHandler类,在其init方法-->loadParsers()方法中,指定由HttpSecurityBeanDefinitionParser进行解析

@@ -244,7 +244,7 @@
 
 - ##### 获取：smembers key:获取set集合中所有元素
 
-- ##### 删除：srem key value:删除set集合中的某个元素	
+	 ##### 删除：srem key value:删除set集合中的某个元素	
 
 
 
@@ -353,6 +353,30 @@
        appendfsync everysec： 每隔一秒进行一次持久化
 
        ＃appendfsync no： 不进行持久化
+
+### 4.1、启动redis 错误解决
+
+```shell
+QForkMasterInit: system error caught. error code=0x000005af, message=VirtualAllocEx failed.: unknow
+
+# 因为没有设置redis的最大内存所导致.
+
+# redis的conf文件设置参数maxheap和maxmemory。
+maxmemory 120MB 
+maxheap 180MB
+
+# maxmemory和maxheap根据自己的电脑配置而定，通常情况下：
+maxheap  = 1.5 * maxmemory
+```
+
+由于我们启动redis时，一般都想做存储，免得每次启动后，数据没有保存，又得重新去调用方法，讲数据缓存到redis。 所以启动命令 : 连带redis.windows.conf
+
+```shell
+$ redis_server.exe redis.windows.conf 
+
+每次还需要去输入两个文件名，不方便。 
+解决方法： 创建一个快捷 ‘redis_start’, 然后将目标设置为redis_server.exe redis.windows.conf 
+```
 
 
 

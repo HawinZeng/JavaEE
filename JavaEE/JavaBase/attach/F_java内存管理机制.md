@@ -18,7 +18,7 @@
 
 ####  2.2、Java运行时的内存模型  
 
-![](F0-java-runtime-memory.jpg)
+![](img/F0-java-runtime-memory.jpg)
 
 1. **程序计数器（Program Counter Register）**
 
@@ -100,15 +100,15 @@ HotSpot的对齐方式为8字节对齐：(对象头+实例数据+padding)%8 等�
 
   对齐填充并不是必然存在的，仅仅起着占位符的作用。Hotpot VM要求对象起始地址必须是8字节的整数倍，对象头部分正好是8字节的倍数，所以当实例数据部分没有对齐时，需要通过对齐填充来对齐。  
 
-![](F0-java_object.png)
+![](img/F0-java_object.png)
 
 #### 4.3 对象的访问定位
 Java程序通过栈上的reference数据来操作堆上的具体对象。主要的访问方式有使用句柄和直接指针两种：
 
 句柄：Java堆将会划出一块内存来作为句柄池，引用中存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自的具体地址信息 。如图所示：  
-![](F0-java-visit-1.png)    
+![](img/F0-java-visit-1.png)    
 直接指针：Java堆对象的布局要考虑如何放置访问类型数据的相关信息，引用中存储的就是对象地址 。如图所示：
-![](F0-java-visit-2.png)  
+![](img/F0-java-visit-2.png)  
 两个方式各有优点，使用句柄最大的好处是引用中存储的是稳定的句柄地址，对象被移动时只会改变句柄中实例的地址，引用不需要修改、使用直接指针访问的好处是速度更快，它节省了一次指针定位的时间开销。
 
 #### 4.5 对象占内存计算
@@ -209,12 +209,12 @@ OOM解决：使用NIO分配本机内存多注意是否超过MaxDirectMemorySize�
 这里所说的内存分配，主要指的是在堆上的分配，一般的，对象的内存分配都是在堆上进行，但现代技术也支持将对象拆成标量类型（标量类型即原子类型，表示单个值，可以是基本类型或String等），然后在栈上分配，在栈上分配的很少见，我们这里不考虑。
 
 　　Java内存分配和回收的机制概括的说，就是：分代分配，分代回收。对象将根据存活的时间被分为：年轻代（Young Generation）、年老代（Old Generation）、永久代（Permanent Generation，也就是方法区）。如下图（来源于《成为JavaGC专家part I》，http://www.importnew.com/1993.html）：  
-　　![](F0-memory_allocation.png)
+　　![](img/F0-memory_allocation.png)
 
 年轻代（Young Generation）：对象被创建时，内存的分配首先发生在年轻代（大对象可以直接被创建在年老代），大部分的对象在创建后很快就不再使用，因此很快变得不可达，于是被年轻代的GC机制清理掉（IBM的研究表明，98%的对象都是很快消亡的），这个GC机制被称为Minor GC或叫Young GC。注意，Minor GC并不代表年轻代内存不足，它事实上只表示在Eden区上的GC。
 
 　　年轻代上的内存分配是这样的，年轻代可以分为3个区域：Eden区（伊甸园，亚当和夏娃偷吃禁果生娃娃的地方，用来表示内存首次分配的区域，再贴切不过）和两个存活区（Survivor 0 、Survivor 1）。内存分配过程为（来源于《成为JavaGC专家part I》，http://www.importnew.com/1993.html）：　  
-　　![](F0-memory_gc.png)  
+　　![](img/F0-memory_gc.png)  
 
 1.绝大多数刚创建的对象会被分配在Eden区，其中的大多数对象很快就会消亡。Eden区是连续的内存空间，因此在其上分配内存极快；  
 2. 最初一次，当Eden区满的时候，执行Minor GC，将消亡的对象清理掉，并将剩余的对象复制到一个存活区Survivor0（此时，Survivor1是空白的，两个Survivor总有一个是空白的）；  

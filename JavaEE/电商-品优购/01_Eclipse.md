@@ -96,7 +96,16 @@ Eclipse 是一个开放源代码的、基于Java的可扩展开发平台。就�
 
 
 
+## 四，错误总结
 
+error1: 
+
+```
+maven install : invalid CEN header (bad signature)
+
+一般是加载对应依赖出错。
+解决：找到对应的本地库位置，删除对应的依赖jar的package，然后重新install，出现重新下载，即可！
+```
 
 
 

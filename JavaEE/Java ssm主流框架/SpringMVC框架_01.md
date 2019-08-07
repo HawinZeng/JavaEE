@@ -1,4 +1,6 @@
-archetypeCatalog:internal
+### archetypeCatalog:internal
+
+
 
 # SpringMVC框架_01
 
@@ -80,6 +82,14 @@ MVC全名是Model View Controller 模型视图控制器,每个部分各司其职
 	Struts2 的 OGNL 表达式使页面的开发效率相比 Spring MVC 更高些,但执行效率并没有比 JSTL 提
 升,尤其是 struts2 的表单标签,远没有 html 执行效率高。
 ```
+
+> ```properties
+> OGNL :  Object Graphic Navigation Language
+> 		    对象    图      导航        语言
+> 
+> 	类中的写法：user.getUsername();
+> 	OGNL表达式写法：user.username	
+> ```
 
 
 

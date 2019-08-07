@@ -62,7 +62,7 @@
 
   ​		它和Spring的JdbcTemplate很像，也是对Jdbc的简单封装
 
-以上这些都不是框架，只不过是 JDBC是规范。Spring的JdbcTemplate和Apache的DBUtils也都只是工具类；
+以上这些都不是框架，只不过是 JDBC的使用规范。Spring的JdbcTemplate和Apache的DBUtils也都只是工具类；
 
 ##### 那么，持久层技术解决方案框架技术：Mybatis！！！
 
@@ -144,8 +144,8 @@ public static void main(String[] args) {
 
 - mybatis 是一个**优秀的基于 java 的持久层框架**，它内部封装了 jdbc，使开发者只需要关注 sql 语句本身,
   而不需要花费精力去处理加载驱动、创建连接、创建 statement 等繁杂的过程。
-- mybatis 通过 xml 或注解的方式将要执行的各种 statement 配置起来，并通过 java 对象和 statement 中  							 						 					   						 							 								sql 的动态参数进行映射生成最终执行的 sql 语句，最后由 mybatis 框架执行 sql 并将结果映射为 java 对象并 返回。  
-- 采用 **ORM** 思想解决了实体和数据库映射的问题，对 jdbc 进行了封装，屏蔽了 jdbc api 底层访问细节，使我  							 						 					   						 							 								们不用与jdbc api打交道，就可以完成对数据库的持久化操作。
+	 mybatis 通过 xml 或注解的方式将要执行的各种 statement 配置起来，并通过 java 对象和 statement 中  							 						 					   						 							 								sql 的动态参数进行映射生成最终执行的 sql 语句，最后由 mybatis 框架执行 sql 并将结果映射为 java 对象并 返回。  
+	 采用 **ORM** 思想解决了实体和数据库映射的问题，对 jdbc 进行了封装，屏蔽了 jdbc api 底层访问细节，使我  							 						 					   						 							 								们不用与jdbc api打交道，就可以完成对数据库的持久化操作。
 
 > ##### 1. 通过了解，MyBatis框架就相应的解决传统jdbc程序遇到的问题！
 >

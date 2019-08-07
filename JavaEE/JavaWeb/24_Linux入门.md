@@ -234,6 +234,8 @@ $ find . -name 'srm*' # 查找当前目录下以‘srm’开头的文件
 $ find / -amin -10 #查找在系统中最后10分钟访问的文件
 $ find / -atime -2 #查找在系统中最后48小时访问的文件
 ...
+
+/root 即是 ~： 没有root目录，只有/root
 ```
 
 #### 3.6、其他常用命令
@@ -248,6 +250,8 @@ $ find / -atime -2 #查找在系统中最后48小时访问的文件
 
 【wget】下载资料
 * wget http://nginx.org/download/nginx-1.9.12.tar.gz
+# wget 到指定目录
+ wget -P /etc/software  http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.33-linux-glibc2.5-x86_64.tar.gz
 ```
 
 
@@ -348,6 +352,8 @@ ping   探测网络是否通畅。
 
 netstat 查看网络端口。
 	netstat -an | grep 3306 查询3306端口占用情况
+	
+	lsof -i:3306  也可以查看端口情况。
 ```
 
 
@@ -451,6 +457,18 @@ groupdel 删除组，如果该组有用户成员，必须先删除用户才能�
 	su - u1 切换到u1用户，并且将环境也切换到u1用户的环境（推荐使用）
 ```
 
+#### 5.4、其他命令
+
+```shell
+$ getconf LONG_BIT  # 查看linux多少位
+
+# 新建一个文件
+$ vim hello.java  # 创建了hello.java文件，此时并到了编辑界面。通过esc + :wq操作即可完成文件编辑后保存。
+
+```
+
+
+
 
 
 ## 六、 Linux的权限命令
@@ -505,19 +523,262 @@ groupdel 删除组，如果该组有用户成员，必须先删除用户才能�
 
 
 
+## 七、 yum vs rpm
+
+**yum**（全称为 Yellow dog Updater, Modified）是一个在Fedora和RedHat以及SUSE中的Shell前端软件包管理器。基於RPM包(RPM 是 Red Hat Package Manager 的缩写，本意是Red Hat 软件包管理，顾名思义是Red Hat 贡献出来的软件包管理)管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软体包，无须繁琐地一次次下载、安装。yum提供了查找、安装、删除某一个、一组甚至全部软件包的命令，而且命令简洁而又好记。 
+
+### 7.1、yum ~ rpm对比
+
+ 	在Linux下安装软件可以利用软件管理程序的方式更加便捷的安装。软件提供商将软件在固定的硬件平台与操作系统平台上将软件预先编译好，将文件打包并且包含预先的检测系统以及依赖软件的脚本。客户得到软件后就可以直接安装软件。
+
+     最常见的两种安装方式是dpkg与RPM。
+
+Dpkg机制是基于Debain Linux开发出来的。用于Debain派生出来的软件管理的，例如Ubuntu。
+
+RPM机制是由REDHAT开发出来，很多的distributions使用，例如Centos 、Fedora等
+
+     CentOS中利用RPM安装软件，rpm将首先根据软件的依赖属性检查软件环境是否可以实现。如果有所依赖软件没有安装，可以用yum进行安装所需的依赖环境。
+
+    RPM的软件预先编译过后打包成RPM机制的安装包。因此，安装该版的.rpm软件需要与厂商打包环境、操作系统的版本相同的下。
+
+而如果Linux环境不同如何安装呢？因此，还有一个SRPM所提供的软件，它是以.src.rpm结尾的文件。它是未编译的，通过修改参数设置文件重新编译生成适合的Linux环境，实现安装。
+
+#####     rpm 安装软件时分析软件的依赖环境，将软件的依赖属性数据与客户主机中的进行对比，然后利用yum可以一次性从yum服务器的容器网址下载安装所需的依赖软件。
+
+
+> ##### CentOS 6.5 : 默认的yum正常，我们解压jdk即是安装。 无需先安装jdk的依赖。
+
+### 7.2、yum安装及配置
+
+yum安装有三种方式：本地安装，局域网安装，在线安装！
+
+- ##### 本地安装（安装yum本地源）：https://www.jianshu.com/p/294040e6a3fb
+
+- ##### 局域网安装：
+
+- ##### 在线安装：https://www.cnblogs.com/puloieswind/p/5802672.html
+
+  ##### 第1步： 删除redhat原有的yum源
+
+  ```shell
+  $ rpm -aq|grep yum|xargs rpm -e --nodeps      # 卸载所有yum相关包
+  ```
+
+  ##### 第2步：下载新的yum安装包
+
+  这里我们会使用到CentOS的yum源，在wget前最好去“<http://mirror.centos.org/centos/6/os/x86_64/Packages>”上确定一下包的版本号，不然可能会获取失败； (centos的yum源，也可以是国内的：http://mirrors.163.com/centos/6/os/x86_64/Packages/)
+
+  ```shell
+  $ wget	http://mirror.centos.org/centos/6/os/x86_64/Packages/python-2.6.6-66.el6_8.x86_64.rpm # 若是重装python需要下载此rpm
+  $ wget	http://mirror.centos.org/centos/6/os/x86_64/Packages/python-iniparse-0.3.1-2.1.el6.noarch.rpm
+  
+  $ wget 	http://mirror.centos.org/centos/6/os/x86_64/Packages/yum-metadata-parser-1.1.2-16.el6.x86_64.rpm
+  $ wget 	http://mirror.centos.org/centos/6/os/x86_64/Packages/yum-3.2.29-81.el6.centos.noarch.rpm
+  $ wget 	http://mirror.centos.org/centos/6/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.30-41.el6.noarch.rpm
+  
+  #　python-urlgrabber >= 3.9.1-10 is needed　更新下面
+  $ wget http://mirror.centos.org/centos/6/os/x86_64/Packages/python-urlgrabber-3.9.1-11.el6.noarch.rpm
+  ```
+
+  ##### 第３步：**安装yum软件包** 
+
+  ```shell
+  $ rpm -ivh  python-iniparse-0.3.1-2.1.el6.noarch.rpm
+  
+  $ rpm -ivh  yum-metadata-parser-1.1.2-14.1.el6.i686.rpm
+  
+  #  注意：最后两个安装包要放在一起同时安装，否则会提示相互依赖，安装失败。同时要注意python-urlgrabber版本
+  $ rpm -ivh  yum-3.2.27-14.el6.centos.noarch.rpm  yum-plugin-fastestmirror-1.1.26-11.el6.noarch.rpm
+  ```
+
+  ##### 第4步：更改yum源  #我们使用网易的CentOS镜像源
+
+  ```shell
+  $ cd /etc/yum.repos.d/
+  
+  $ wget  http://mirrors.163.com/.help/CentOS6-Base-163.repo
+  
+  $ vi CentOS6-Base-163.repo
+  # 编辑文件，把文件里面的$releasever全部替换为版本号，即6，最后保存！
+  ```
+
+  ##### 第5步： **清理yum缓存** 
+
+  ```shell
+  $ yum clean all
+  
+  $ yum makecache     # 将服务器上的软件包信息缓存到本地,以提高搜索安装软件的速度
+  
+  $ yum install vim*    # 测试域名是否可用
+  ```
+
+  
 
 
 
 
 
+> ##### 安装yum后，CentOS还有一个源叫做 EPEL (Extra Packages for Enterprise)，里面有1万多个软件，比163的源还强，强烈建议安装。 
+
+### 7.3、jdk安装：
+
+默认情况下载：jdk-8u171-linux-x64.tar.gz  这种都是非rpm格式，纯绿色版，解压即可使用。所以，我们通过rpm -qa | grep jdk/java是发现了安装内容的。
+
+那么，就无法使用rpm来卸载了。 想绿色版，直接删除环境变量配置即可。
+
+若要rpm安装jdk，那么就得下rpm格式的jdk。同时还需要yum源做支撑。
 
 
 
+## 八、光盘镜像版本区别：
+
+​	LiveCD和LiveDVD是用于引导和安装系统的光盘镜像，一般带桌面环境，不带软件仓库，如果要把系统安装到硬盘上则需要从网络上下载软件包。
+
+​	系统安装DVD是用来安装系统到硬盘的光盘镜像，仅自带系统安装程序及软件仓库，系统安装时不需要连网，光盘中自带大量软件，光盘容量一般超过4G。
+
+​	网络安装光盘是用来安装系统到硬盘的光盘镜像，仅有系统安装程序，不带软件仓库，系统安装时必须连网，光盘容量一般小于700M。
+
+​	精简版安装光盘是用来安装最基本系统到硬盘的光盘镜像，带安装程序及部分基本软件仓库，系统安装时不需连网，光盘容量一般小于700M。
+
+|                 | 桌面环境 | 系统安装程序 | 软件仓库 | 是否需要连网安装 | 光盘容量 |
+| --------------- | -------- | ------------ | -------- | ---------------- | -------- |
+| LiveCD和LiveDVD | 是       | 是           | 否       | 是               | 700M至4G |
+| 系统安装DVD     | 否       | 是           | 是       | 否               | 大于4G   |
+| 网络安装光盘    | 否       | 是           | 否       | 是               | 小于700M |
+| 精简版安装光盘  | 否       | 是           | 部分     | 否               | 小于700M |
+
+> #### 注意事项：
+>
+> 1、dvd1是系统和一些软件包，dvd2还有些别的软件包，一般是额外的软件包，可以不下载。之所以分成两个，是因为个人电脑刻录光盘的文件不能超过4.7G，而centos自带的软件包就超过了这个限制，所以为了方便刻录，就分成了两个文件，DVD1中包含主要的centos系统，和部分必需的软件包，DVD2就是些额外的软件包，在安装centos的时候只需要DVD1就够了，而另一张DVD2中额外的软件可以通过网络安装，或者下载源码自己编译安装。
+>
+> 2、torrent文件本质上是文本文件，包含Tracker信息和文件信息两部分。Tracker信息主要是**[BT下载]**中需要用到的Tracker服务器的地址和针对Tracker服务器的设置，文件信息是根据对**[目标文件]**的计算生成的，计算结果根据BitTorrent协议内的B编码规则进行编码。所以，torrent文件就是被下载文件的“索引”。 
+>
+> 所以，centOS 6.5 主要是DVD1主要安装包，DVD2额外软件包，DVD1toDVD2.torrent只是一个供BT下载的索引。
+>
+> 3、可以合并DVD1+DVD2 作为本地 YUM 源：https://www.jianshu.com/p/294040e6a3fb
+
+CentOS下载链接：
+
+http://mirrors.huaweicloud.com/centos/6.10/isos/x86_64/
+
+<http://mirrors.aliyun.com/centos/7.6.1810/isos/x86_64/CentOS-7-x86_64-DVD-1810.iso> 
+
+<http://mirrors.163.com/centos/7.6.1810/isos/x86_64/CentOS-7-x86_64-DVD-1810.iso> 
+
+都是国内大型互联网的redirect下载目录，内容各个不同版本。（在对应的ISOS目录下）
+
+version7之后，没有两个dvd文件。
+
+```
+CentOS中DVD：标准安装，一般用这个就可以
+Everything：对完整安装盘的软件进行补充，集成所有软件，包括各种packages
+LiveGnome：Gnome桌面版
+LiveKED：KED桌面版
+NetInstall：网络安装镜像
+liveCD：光盘上运行的系统，类似于winpe，不用安装可以使用的
+
+下面是借用的网友的：
+CentOS-7.0-1406-x86_64-DVD.iso             标准安装版，一般下载这个就可以了
+CentOS-7.0-1406-x86_64-NetInstall.iso       网络安装镜像
+CentOS-7.0-1406-x86_64-Everything.iso     对完整版安装盘的软件进行补充，集成所有软件。
+CentOS-7.0-1406-x86_64-GnomeLive.iso   GNOME桌面版
+CentOS-7.0-1406-x86_64-KdeLive.iso         KDE桌面版
+CentOS-7.0-1406-x86_64-livecd.iso            光盘上运行的系统，类拟于winpe 
+```
 
 
 
+## 九、Linux 下安装MySQL
+
+### 9.1 下载安装包，上传及安装
+
+```shell
+# https://dev.mysql.com/downloads/mysql/   选择页面左侧的MySQL Community Server
+
+#　上传mysql rpm 文件到linux
+$ sftp> put d:/my-developer/mysql-package/MySQL-client-5.6.43-1.el6.x86_64.rpm
+$ sftp> put d:/my-developer/mysql-package/MySQL-server-5.6.43-1.el6.x86_64.rpm
+
+# 安装
+$ rpm -ivh MySQL-server-5.6.43-1.el6.x86_64.rpm
+$ rpm -ivh MySQL-client-5.6.43-1.el6.x86_64.rpm
+```
+
+### 9.2 基本配置
 
 
+
+### 9.3 问题解决
+
+```shell
+# 若启动发生错误
+$ cat /var/lib/mysql/localhost.localdomain.err   # 查看错误日志，里面的error就是真实的原因！
+```
+
+##### 问题1： /etc 下没有my.cnf文件
+
+```shell
+$ cd /usr/share/mysql 
+# 复制 my-default.cnf 或者my-medium.cnf到 /etc目录
+$ cp my-default.cnf /etc/my.cnf
+```
+
+##### 问题2：不能进入mysql
+
+```shell
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+
+# 原因是mysql初始化的密码你根本不知道是个啥，哪有怎么能进入呢？ 解决之道，我们要设置跳过密码选项
+# my.cnf文件：在[mysqld]后面任意一行添加“skip-grant-tables”用来跳过密码验证的过程
+
+$ vim /etc/my.cnf
+# 添加后,重启mysql
+$ service mysql restart
+
+# 此时可以无密码进入msyql,然后及时修改 root user的密码
+$ mysql> update mysql.user set password=password('123456') where user='root';
+$ mysql> flush privileges;
+$ mysql> quit
+
+# 接着，移除先前在my.cnf添加的“skip-grant-tables”
+$ service mysql restart # 即可使用 123456 密码进入了。
+
+# 但是此时还不能操作任何数据库，或者不能执行任何语句。需要在设置下密码
+$ mysql > SET PASSWORD=PASSWORD('123456');
+
+# 然后就可以正常使用了！
+```
+
+
+
+## 十、Linux 重启
+
+#### Linux centos关机与重启命令详解与实战 　
+
+##### Linux centos重启命令： 　　
+
+​	1、reboot   普通重启 　　
+
+​	2、shutdown -r now 立刻重启(root用户使用) 　　
+
+​	3、shutdown -r 10 过10分钟自动重启(root用户使用) 　　
+
+​	4、shutdown -r 20:35 在时间为20:35时候重启(root用户使用) 　　
+
+​	如果是通过shutdown命令设置重启的话，可以用shutdown -c命令取消重启 　
+
+##### Linux centos关机命令： 　　
+
+​	1、halt 立刻关机 　　
+
+​	2、poweroff 立刻关机 　　
+
+​	3、shutdown -h now 立刻关机(root用户使用) 　　
+
+​	4、shutdown -h 10 10分钟后自动关机 　　
+
+​	如果是通过shutdown命令设置关机的话，可以用shutdown -c命令取消重启 
 
 
 

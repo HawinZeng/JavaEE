@@ -675,7 +675,9 @@ Entry<K,V> e = table[bucketIndex];
 
  **现在进一步细节说明Hash碰撞：**  
 1.什么是hashMap碰撞？  **（JDK 8之前版本：使用链表地址解决，而JDK 8采用红黑树）**
-就是两个对象的key的hashcode是一样的，这个时候怎么get他的value呢？答案是通过equals遍历table那个位置上面的Entry链表。
+就是两个对象的key的hashcode是一样的，这个时候怎么get他的value呢？
+
+#### 答案是通过equals遍历table那个位置上面的Entry链表。
 
 2.举例
 

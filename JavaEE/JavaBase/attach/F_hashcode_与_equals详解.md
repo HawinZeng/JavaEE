@@ -643,7 +643,7 @@ HashMap 高度依赖的 hashcode 和 hash 算法，虽然在很多书里面，�
 
 那么我们就说说为什么使用 hashcode ，hashCode 存在的第一重要的原因就是在 HashMap(HashSet 其实就是HashMap) 中使用（其实Object 类的 hashCode 方法注释已经说明了 ），我知道，HashMap 之所以速度快，因为他使用的是散列表，根据 key 的 hashcode 值生成数组下标（通过内存地址直接查找，没有任何判断），时间复杂度完美情况下可以达到 n1（和数组相同，但是比数组用着爽多了，但是需要多出很多内存，相当于以空间换时间）。
 
-扩展内容如下：[hash的详解](file:///Volumes/C/Study/Java （重点）/Java base notes/F_hash的基本原理与实现.md)
+扩展内容如下：[hash的详解](attach/F_hash的基本原理与实现.md)
 
 
 ### 3. String 类型的 hashcode 方法

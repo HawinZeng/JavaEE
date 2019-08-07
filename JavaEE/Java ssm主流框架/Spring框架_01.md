@@ -437,6 +437,38 @@ public class Client {
 
 
 
+## 五、其他特殊说明
+
+### 5.1、spring 在web.xml 里面如何使用多个xml配置文件
+
+##### 注意：分隔是用','，不是‘;’。
+
+```xml
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+        classpath*:conf/spring/applicationContext_core*.xml,
+        classpath*:conf/spring/applicationContext_dict*.xml,
+        classpath*:conf/spring/applicationContext_hibernate.xml,
+        classpath*:conf/spring/applicationContext_staff*.xml,
+        classpath*:conf/spring/applicationContext_security.xml
+        classpath*:conf/spring/applicationContext_modules*.xml
+        classpath*:conf/spring/applicationContext_cti*.xml
+        classpath*:conf/spring/applicationContext_apm*.xml
+    </param-value>
+</context-param> 
+
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring/spring-security.xml,classpath:spring/applicationContext*.xml</param-value>
+</context-param>
+<listener>
+    <listener-class>
+        org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+</listener>
+```
+
 
 
 

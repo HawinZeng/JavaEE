@@ -1,0 +1,8 @@
+grant codeBase "file:/E:/GitHub/JavaEE/study-code/log-sample-maven/server-privileges/bin/*" {
+    permission java.io.FilePermission "E:/GitHub/JavaEE/study-code/log-sample-maven/asset/client-privileges-1.0-SNAPSHOT.jar", "read";
+    permission java.lang.RuntimePermission "createClassLoader";
+};
+
+grant codeBase  "file:/E:/GitHub/JavaEE/study-code/log-sample-maven/asset/home/*"   {
+    permission java.io.FilePermission  "E:/GitHub/JavaEE/study-code/log-sample-maven/asset/aa.txt","read";
+ };
